@@ -39,7 +39,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
             >
-              Designing the Future &nbsp;•&nbsp; Coding the Dream
+              I have no idea &nbsp;•&nbsp; so just waiting
             </motion.p>
           </motion.div>
         </div>
