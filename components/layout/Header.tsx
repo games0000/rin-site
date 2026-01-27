@@ -7,9 +7,11 @@ import { useState, useEffect } from "react";
 
 const navItems = [
   { label: "Home", path: "/" },
+  { label: "Plan", path: "/plan" },
+  { label: "Timeline", path: "/timeline" },
   { label: "Notes", path: "/notes" },
-  { label: "About", path: "/about" },
   { label: "Letter", path: "/letter" },
+  { label: "About", path: "/about" },
 ];
 
 export default function Header() {
