@@ -2,7 +2,7 @@ backend:
   name: github
   repo: games0000/rin-site
   branch: main
-  base_url: https://rin-site.vercel.app # 您的 Vercel 域名
+  base_url: https://rin-tateishi.info # 您的自定义域名
   auth_endpoint: api/auth # 我们刚刚创建的 API 路由
 
 media_folder: "public/images"
