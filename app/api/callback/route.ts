@@ -80,7 +80,12 @@ export async function GET(request: Request) {
       <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
         <h1 id="status">Authentication successful</h1>
         <p>You can close this window now.</p>
-        <p style="font-size: 12px; color: #666;">If the window doesn't close automatically, check the console for errors.</p>
+        <button onclick="sendMsg()" style="padding: 10px 20px; font-size: 16px; cursor: pointer; background: #333; color: white; border: none; border-radius: 5px;">
+          Click here if not redirected
+        </button>
+        <p style="font-size: 12px; color: #666; margin-top: 20px;">
+          Debug info: Provider=${content.provider}
+        </p>
       </div>
       </body>
       </html>
