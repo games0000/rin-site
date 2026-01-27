@@ -36,23 +36,47 @@ export async function GET(request: Request) {
     const token = data.access_token;
 
     // Decap CMS expects a postMessage with the provider and token
+    const content = {
+      token,
+      provider: 'github'
+    };
+
     const html = `
+      <!DOCTYPE html>
+      <html>
+      <body>
       <script>
-        const receiveMessage = (message) => {
-          window.opener.postMessage(
-            'authorization:github:success:${JSON.stringify({ token, provider: 'github' })}',
-            message.origin
-          );
+        const content = ${JSON.stringify(content)};
+        const msg = 'authorization:github:success:' + JSON.stringify(content);
+        
+        function sendMsg() {
+          if (window.opener) {
+            console.log('Sending message to opener:', msg);
+            window.opener.postMessage(msg, '*');
+          } else {
+            console.error('No window.opener found');
+            document.getElementById('status').innerText = 'Error: No window.opener found. Please close this window and try again.';
+          }
         }
-        window.addEventListener("message", receiveMessage, false);
-        // Fallback for some versions of CMS
-        window.opener.postMessage(
-          'authorization:github:success:${JSON.stringify({ token, provider: 'github' })}',
-          '*'
-        );
+
+        // Send immediately
+        sendMsg();
+        
+        // Also listen for handshake
+        window.addEventListener("message", (e) => {
+          if (e.data === "authorizing:github") {
+            console.log('Received handshake, sending message...');
+            window.opener.postMessage(msg, e.origin);
+          }
+        }, false);
       </script>
-      <h1>Authentication successful</h1>
-      <p>You can close this window now.</p>
+      <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
+        <h1 id="status">Authentication successful</h1>
+        <p>You can close this window now.</p>
+        <p style="font-size: 12px; color: #666;">If the window doesn't close automatically, check the console for errors.</p>
+      </div>
+      </body>
+      </html>
     `;
     
     return new NextResponse(html, { 
