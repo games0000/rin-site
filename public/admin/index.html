@@ -6,6 +6,12 @@
   <title>Content Manager</title>
   <!-- <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script> -->
   <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+  <style>
+    /* Fix for Netlify Identity widget overlay */
+    iframe[id^="netlify-identity-widget"] {
+      z-index: 99999 !important;
+    }
+  </style>
 </head>
 <body>
   <!-- Include the script that builds the page and powers Decap CMS -->
