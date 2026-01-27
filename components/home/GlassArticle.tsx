@@ -1,7 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import FeatherIcon from "./FeatherIcon";
+import AnimeSplitText from "../ui/AnimeSplitText";
 
 export default function GlassArticle() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,18 +23,23 @@ export default function GlassArticle() {
         className={`
           relative overflow-hidden
           bg-white/5 backdrop-blur-md border border-white/10
-          rounded-2xl cursor-pointer transition-all duration-1000 ease-in-out
+          rounded-2xl cursor-pointer transition-all duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]
           hover:bg-white/10 hover:border-white/20 shadow-2xl
           ${isOpen ? "p-8 md:p-12" : "p-6 md:p-8"}
         `}
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        transition={{ layout: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } }}
       >
         {/* 装饰光效：顶部流光 */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-50" />
         
+        {/* 羽毛笔 SVG 动画 */}
+        <div className="absolute top-6 right-6 opacity-50 pointer-events-none">
+          <FeatherIcon />
+        </div>
+
         <motion.h2 
           layout="position"
           className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-wide font-serif"
@@ -42,32 +49,36 @@ export default function GlassArticle() {
 
         <motion.div layout className="text-gray-300 leading-relaxed space-y-4 font-light text-justify">
           <p>
-            我还没有想好，再等等吧，抱歉。
-            下面是用来占位的文字，与本站无关。
+            <AnimeSplitText delay={0.2}>
+              我还没有想好，再等等吧，抱歉。下面是用来占位的文字，与本站无关。
+            </AnimeSplitText>
           </p>
           
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <p>
-                我不是在任何事情上都会反复犹豫的人。
-              </p>
-              <p className="mt-4">
-                相反，在真正重要的事情面前，我往往异常冷静。
-              </p>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4">
+                  <p>
+                    <AnimeSplitText delay={0.1}>我不是在任何事情上都会反复犹豫的人。</AnimeSplitText>
+                  </p>
+                  <p className="mt-4">
+                    <AnimeSplitText delay={0.2}>相反，在真正重要的事情面前，我往往异常冷静。</AnimeSplitText>
+                  </p>
              
               <p className="mt-4">
-                在行动之前，我会先确认一件事值不值得。一旦确认，我就会开始准备。
-                准备的过程对我来说并不痛苦，反而是一种让我安心的状态。我会逐字推敲，反复确认分寸，确认语言是否得体，姿态是否合宜，逻辑是否成立，心意是否清晰而不越界。
+                <AnimeSplitText delay={0.3}>在行动之前，我会先确认一件事值不值得。一旦确认，我就会开始准备。准备的过程对我来说并不痛苦，反而是一种让我安心的状态。我会逐字推敲，反复确认分寸，确认语言是否得体，姿态是否合宜，逻辑是否成立，心意是否清晰而不越界。</AnimeSplitText>
               </p>
                <p className="mt-4">
-                只要我开始动手，就意味着我已经接受了这件事的重量。
+                <AnimeSplitText delay={0.4}>只要我开始动手，就意味着我已经接受了这件事的重量。</AnimeSplitText>
               </p>
                <p className="mt-4">
-                写那封信的时候也是这样。
+                <AnimeSplitText delay={0.5}>写那封信的时候也是这样。</AnimeSplitText>
               </p>
                <p className="mt-4">
                 当时的我没有迟疑，也没有负面情绪，更没有“先做着看看”的心态。那不是仓促的决定，而是一个已经被我反复确认过的选择。我清楚自己在做什么，也清楚这封信会被谁读到。
@@ -207,19 +218,24 @@ export default function GlassArticle() {
               <p className="mt-8 font-serif italic text-right text-white/60">
                 2026 1.27
               </p>
+              </div>
             </motion.div>
           )}
+          </AnimatePresence>
         </motion.div>
 
         {/* 底部渐变遮罩 (仅收起时显示，暗示还有内容) */}
-        {!isOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"
-          />
-        )}
+        <AnimatePresence>
+          {!isOpen && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"
+            />
+          )}
+        </AnimatePresence>
         
         {/* 展开/收起 指示器 */}
         <motion.div 
@@ -240,3 +256,4 @@ export default function GlassArticle() {
     </div>
   );
 }
+
