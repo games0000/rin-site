@@ -22,7 +22,7 @@ export function getPosts(collection: string) {
       id,
       ...data,
       content, // Include the markdown content
-    };
+    } as unknown as Record<string, unknown>; // More specific type than any
   });
 
   // Sort posts by date

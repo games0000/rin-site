@@ -38,7 +38,7 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
               animate={{ y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              RIN'S SPACE
+              RIN&apos;S SPACE
             </motion.h1>
             
             <motion.div 

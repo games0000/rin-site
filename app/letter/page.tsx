@@ -1,8 +1,16 @@
 import { getPosts } from "@/lib/api";
 import LetterClient from "@/components/letter/LetterClient";
 
-export default function LetterPage() {
-  const letters = getPosts("letters");
+interface Letter {
+  id: string;
+  title: string;
+  date: string;
+  content: string;
+  color?: string;
+}
 
-  return <LetterClient letters={letters as any} />;
+export default function LetterPage() {
+  const letters = getPosts("letters") as unknown as Letter[];
+
+  return <LetterClient letters={letters} />;
 }

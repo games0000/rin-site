@@ -51,7 +51,7 @@ export default function AboutPage() {
           transition={{ delay: 0.5 }}
         >
           <p>Built with Next.js, Tailwind CSS, and Framer Motion.</p>
-          <p className="mt-2">© 2026 Rin's Space. All rights reserved.</p>
+          <p className="mt-2">© 2026 Rin&apos;s Space. All rights reserved.</p>
         </motion.div>
       </div>
     </main>
