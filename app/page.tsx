@@ -8,9 +8,9 @@ export default function Home() {
 
   return (
     <HomeClient 
-      recentPlans={recentPlans}
-      recentNotes={recentNotes}
-      recentLetters={recentLetters}
+      recentPlans={recentPlans as any}
+      recentNotes={recentNotes as any}
+      recentLetters={recentLetters as any}
     />
   );
 }
