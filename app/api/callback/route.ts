@@ -30,7 +30,14 @@ export async function GET(request: Request) {
     const data = await response.json();
 
     if (data.error) {
-      return NextResponse.json({ error: data.error_description || data.error }, { status: 400 });
+      return new NextResponse(`
+        <html>
+          <body>
+            <h1>Error</h1>
+            <p>${data.error_description || data.error}</p>
+          </body>
+        </html>
+      `, { status: 400, headers: { 'Content-Type': 'text/html' } });
     }
 
     const token = data.access_token;
