@@ -127,6 +127,17 @@ export const timelineEvents: TimelineEvent[] = [
 
 export const changelog: ChangelogItem[] = [
   {
+    version: "v1.2.0",
+    date: "2026-01-27",
+    changes: [
+      "Integrated Decap CMS for content management.",
+      "Added GitHub OAuth authentication for Admin panel.",
+      "Migrated content data to Markdown files.",
+      "Refactored pages to support Server Components and Client Components separation.",
+      "Implemented file-based data fetching API."
+    ]
+  },
+  {
     version: "v1.1.0",
     date: "2026-01-27",
     changes: [
