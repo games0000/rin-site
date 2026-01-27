@@ -14,6 +14,8 @@ export async function GET(request: Request) {
   }
 
   try {
+    console.log(`Exchanging code for token... Code: ${code.substring(0, 5)}...`);
+    
     const response = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
@@ -28,13 +30,23 @@ export async function GET(request: Request) {
     });
 
     const data = await response.json();
+    console.log('GitHub response:', JSON.stringify(data));
 
     if (data.error) {
       return new NextResponse(`
         <html>
           <body>
-            <h1>Error</h1>
-            <p>${data.error_description || data.error}</p>
+            <h1>Authentication Failed</h1>
+            <p><strong>Error:</strong> ${data.error}</p>
+            <p><strong>Description:</strong> ${data.error_description}</p>
+            <hr />
+            <h3>Debug Info:</h3>
+            <ul>
+              <li>Client ID (first 4 chars): ${OAUTH_CLIENT_ID?.substring(0, 4)}***</li>
+              <li>Code provided: ${code ? 'Yes' : 'No'}</li>
+              <li>Secret available: ${OAUTH_CLIENT_SECRET ? 'Yes' : 'No'}</li>
+            </ul>
+            <p><em>Please check your Vercel Environment Variables. If Client ID/Secret are correct, the code might have expired (do not refresh this page).</em></p>
           </body>
         </html>
       `, { status: 400, headers: { 'Content-Type': 'text/html' } });
