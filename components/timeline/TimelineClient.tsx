@@ -1,11 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 interface TimelineEvent {
   id: string;
-  date: string; // From markdown frontmatter "date" or "dateString"
+  date: string;
   year?: string;
   title: string;
   description: string;
@@ -13,73 +13,85 @@ interface TimelineEvent {
 }
 
 export default function TimelineClient({ events }: { events: TimelineEvent[] }) {
-  const [search, setSearch] = useState("");
-  
-  const filteredEvents = events.filter((event) => 
-    event.title.toLowerCase().includes(search.toLowerCase()) || 
-    event.description?.toLowerCase().includes(search.toLowerCase()) ||
-    event.year?.includes(search)
-  );
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
 
   return (
-    <main className="min-h-screen pt-32 pb-20 px-4 relative">
-      <div className="fixed inset-0 bg-black/10 pointer-events-none z-0" />
+    <main ref={containerRef} className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Background */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-gradient-to-b from-blue-900/10 via-purple-900/10 to-transparent blur-3xl" />
+      </div>
 
-      <div className="max-w-2xl mx-auto relative z-10">
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-serif text-white mb-6">Timeline</h1>
-          <input
-            type="text"
-            placeholder="Search timeline..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full max-w-md bg-white/5 border border-white/10 rounded-full px-6 py-3 text-white placeholder-white/30 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all"
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-32">
+        <motion.h1 
+          className="text-6xl md:text-9xl font-serif font-bold text-center mb-32 text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1 }}
+        >
+          Timeline
+        </motion.h1>
+
+        {/* Center Line */}
+        <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-white/10 md:-translate-x-1/2">
+          <motion.div 
+            className="w-full bg-white origin-top"
+            style={{ scaleY: scrollYProgress, height: "100%" }}
           />
         </div>
 
-        <div className="relative border-l border-white/10 ml-4 md:ml-0 space-y-12 pl-8 md:pl-0">
-          {filteredEvents.map((event, index) => (
-            <motion.div 
-              key={event.id}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative md:grid md:grid-cols-[1fr_auto_1fr] md:gap-8 items-center"
-            >
-              {/* Date (Left on Desktop) */}
-              <div className="hidden md:block text-right">
-                <span className="text-white/40 font-mono text-sm">{event.date}</span>
-              </div>
-
-              {/* Dot */}
-              <div className="absolute left-[-37px] md:static md:left-auto flex items-center justify-center">
-                <div className="w-4 h-4 rounded-full bg-white/20 border border-white/40 backdrop-blur-sm" />
-              </div>
-
-              {/* Content (Right on Desktop) */}
-              <div className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors">
-                <div className="md:hidden text-white/40 font-mono text-xs mb-2">{event.date}</div>
-                <h3 className="text-xl font-medium text-white/90 mb-2">{event.title}</h3>
-                <p className="text-white/60 text-sm leading-relaxed mb-3">
-                  {event.description}
-                </p>
-                {event.category && (
-                  <span className="text-[10px] uppercase tracking-wider text-white/30 border border-white/10 px-2 py-0.5 rounded-full">
-                    {event.category}
-                  </span>
-                )}
-              </div>
-            </motion.div>
+        <div className="space-y-24">
+          {events.map((event, index) => (
+            <TimelineItem key={event.id} event={event} index={index} />
           ))}
-
-          {filteredEvents.length === 0 && (
-            <div className="text-center text-white/30 py-10">
-              No events found.
-            </div>
-          )}
         </div>
       </div>
     </main>
+  );
+}
+
+function TimelineItem({ event, index }: { event: TimelineEvent; index: number }) {
+  const isEven = index % 2 === 0;
+  
+  return (
+    <motion.div 
+      className={`relative flex md:justify-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Content */}
+      <div className={`
+        ml-12 md:ml-0 md:w-1/2 
+        ${isEven ? 'md:pr-16 md:text-right' : 'md:pl-16 md:text-left'}
+      `}>
+        <div className="relative group">
+          {/* Connector Line (Desktop) */}
+          <div className={`
+            hidden md:block absolute top-6 w-16 h-px bg-white/20
+            ${isEven ? 'right-[-64px]' : 'left-[-64px]'}
+            group-hover:w-24 group-hover:bg-white transition-all duration-300
+          `} />
+
+          <span className="text-sm font-mono text-blue-400 mb-2 block">{event.date}</span>
+          <h3 className="text-3xl font-bold mb-4">{event.title}</h3>
+          <p className="text-white/60 leading-relaxed text-lg">{event.description}</p>
+          
+          {event.category && (
+            <span className="inline-block mt-4 text-xs uppercase tracking-widest px-3 py-1 border border-white/10 rounded-full text-white/40">
+              {event.category}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Center Dot */}
+      <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-6 w-3 h-3 bg-black border-2 border-white rounded-full z-20 shadow-[0_0_20px_rgba(255,255,255,0.5)]" />
+    </motion.div>
   );
 }
