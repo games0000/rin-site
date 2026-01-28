@@ -21,60 +21,21 @@ interface HomeClientProps {
 export default function HomeClient({ recentPlans, recentNotes, recentLetters }: HomeClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Custom Cursor Logic
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
-  const springConfig = { damping: 25, stiffness: 700 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
-
-  useEffect(() => {
-    const moveCursor = (e: MouseEvent) => {
-      cursorX.set(e.clientX - 16); // Center the 32px cursor
-      cursorY.set(e.clientY - 16);
-    };
-    window.addEventListener("mousemove", moveCursor);
-    return () => window.removeEventListener("mousemove", moveCursor);
-  }, []);
-
   return (
     <div ref={containerRef} className="bg-[#EBEBEB] min-h-screen text-[#1A1A1A] font-sans selection:bg-[#FF3333] selection:text-white relative">
-      
-      {/* Navigation - Fixed, Bold, Mix-Blend - MOVED TO LAYOUT, REMOVED FROM HERE TO AVOID CONFLICT */}
       
       {/* Hero Section */}
       <section className="h-screen flex flex-col justify-between p-6 pt-32 relative border-b-2 border-[#1A1A1A]">
         <div className="max-w-[90vw] relative z-10">
           <h1 className="text-[12vw] leading-[0.8] font-black tracking-tighter uppercase text-[#1A1A1A]">
             <span className="block overflow-hidden">
-              <motion.span 
-                initial={{ y: "100%" }} 
-                animate={{ y: 0 }} 
-                transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
-                className="block"
-              >
-                Digital
-              </motion.span>
+              <StaggerText text="Digital" delay={0} />
             </span>
             <span className="block overflow-hidden">
-              <motion.span 
-                initial={{ y: "100%" }} 
-                animate={{ y: 0 }} 
-                transition={{ duration: 1, delay: 0.1, ease: [0.76, 0, 0.24, 1] }}
-                className="block pl-[10vw] text-transparent bg-clip-text bg-gradient-to-r from-[#FF3333] to-[#FF0000]"
-              >
-                Garden
-              </motion.span>
+              <StaggerText text="Garden" delay={0.2} className="pl-[10vw] text-transparent bg-clip-text bg-gradient-to-r from-[#FF3333] to-[#FF0000]" />
             </span>
             <span className="block overflow-hidden">
-              <motion.span 
-                initial={{ y: "100%" }} 
-                animate={{ y: 0 }} 
-                transition={{ duration: 1, delay: 0.2, ease: [0.76, 0, 0.24, 1] }}
-                className="block text-right"
-              >
-                Archive
-              </motion.span>
+              <StaggerText text="Archive" delay={0.4} className="text-right" />
             </span>
           </h1>
         </div>
@@ -126,7 +87,7 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
             {recentPlans.slice(0, 3).map((item, i) => (
               <PlanItem key={item.id} item={item} index={i} />
             ))}
-            <Link href="/plan" className="mt-auto p-8 border-t-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#EBEBEB] transition-colors uppercase text-sm font-bold tracking-widest text-center cursor-none">
+            <Link href="/plan" className="mt-auto p-8 border-t-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#EBEBEB] transition-colors uppercase text-sm font-bold tracking-widest text-center">
               [ View All Blueprints ]
             </Link>
           </div>
@@ -144,7 +105,7 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
             {recentNotes.slice(0, 3).map((item, i) => (
               <NoteItem key={item.id} item={item} index={i} />
             ))}
-            <Link href="/notes" className="mt-auto p-8 border-t-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#EBEBEB] transition-colors italic text-lg font-medium text-center cursor-none">
+            <Link href="/notes" className="mt-auto p-8 border-t-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#EBEBEB] transition-colors italic text-lg font-medium text-center">
               Read all thoughts →
             </Link>
           </div>
@@ -162,7 +123,7 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
             {recentLetters.slice(0, 3).map((item, i) => (
               <LetterItem key={item.id} item={item} index={i} />
             ))}
-            <Link href="/letter" className="mt-auto p-8 border-t-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#EBEBEB] transition-colors font-bold text-sm tracking-wide text-center cursor-none">
+            <Link href="/letter" className="mt-auto p-8 border-t-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#EBEBEB] transition-colors font-bold text-sm tracking-wide text-center">
               OPEN ARCHIVE
             </Link>
           </div>
@@ -188,6 +149,34 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
   );
 }
 
+// Helper for Staggered Text Reveal
+function StaggerText({ text, delay = 0, className = "" }: { text: string, delay?: number, className?: string }) {
+  return (
+    <motion.span 
+      className={`inline-block ${className}`}
+      initial="hidden"
+      animate="visible"
+      variants={{
+        visible: { transition: { staggerChildren: 0.05, delayChildren: delay } },
+        hidden: {}
+      }}
+    >
+      {text.split("").map((char, i) => (
+        <motion.span
+          key={i}
+          variants={{
+            visible: { y: 0, opacity: 1, transition: { type: "spring", damping: 12, stiffness: 200 } },
+            hidden: { y: "100%", opacity: 0 }
+          }}
+          className="inline-block"
+        >
+          {char}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+}
+
 function LetterContent() {
   const [expanded, setExpanded] = useState(false);
 
@@ -208,15 +197,12 @@ function LetterContent() {
               exit={{ opacity: 0 }}
               className="mt-8 text-lg font-serif leading-relaxed text-[#1A1A1A]/80 max-w-3xl"
             >
-              <p className="mb-6">
-                This space is not designed to be efficient or optimized for engagement. It is a quiet corner where I can document my journey, successes, and failures without the noise of social media algorithms.
-              </p>
-              <p className="mb-6">
-                Whether you are here to explore my technical blueprints, read my personal reflections, or just wander through the timeline of events, I hope you find something that resonates with you.
-              </p>
-              <p>
-                Take your time. There is no rush here.
-              </p>
+              {/* Typewriter Effect Content */}
+              <TypewriterText text="This space is not designed to be efficient or optimized for engagement. It is a quiet corner where I can document my journey, successes, and failures without the noise of social media algorithms." />
+              <div className="h-4" />
+              <TypewriterText text="Whether you are here to explore my technical blueprints, read my personal reflections, or just wander through the timeline of events, I hope you find something that resonates with you." delay={2} />
+              <div className="h-4" />
+              <TypewriterText text="Take your time. There is no rush here." delay={4} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -244,10 +230,33 @@ function LetterContent() {
   );
 }
 
+// Helper for Typewriter Effect
+function TypewriterText({ text, delay = 0 }: { text: string, delay?: number }) {
+  return (
+    <motion.p
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: delay }}
+    >
+      {text.split(" ").map((word, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, delay: delay + i * 0.05 }}
+          className="inline-block mr-1"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </motion.p>
+  );
+}
+
 // 1. Plan Item (Technical, Monospace) - Slide Effect
 function PlanItem({ item, index }: { item: Post, index: number }) {
   return (
-    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 cursor-none overflow-hidden">
+    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 overflow-hidden cursor-pointer">
       {/* Sliding Background */}
       <div className="absolute inset-0 bg-[#1A1A1A] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0" />
       
@@ -270,7 +279,7 @@ function PlanItem({ item, index }: { item: Post, index: number }) {
 // 2. Note Item (Elegant, Serif) - Slide Effect
 function NoteItem({ item, index }: { item: Post, index: number }) {
   return (
-    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 cursor-none overflow-hidden">
+    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 overflow-hidden cursor-pointer">
       {/* Sliding Background */}
       <div className="absolute inset-0 bg-[#1A1A1A] -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out z-0" />
 
@@ -292,7 +301,7 @@ function NoteItem({ item, index }: { item: Post, index: number }) {
 // 3. Letter Item (Bold, Sans) - Slide Effect
 function LetterItem({ item, index }: { item: Post, index: number }) {
   return (
-    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 cursor-none overflow-hidden">
+    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 overflow-hidden cursor-pointer">
       {/* Sliding Background */}
       <div className="absolute inset-0 bg-[#FF3333] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0" />
 
