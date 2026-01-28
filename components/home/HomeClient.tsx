@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 
@@ -21,11 +21,45 @@ interface HomeClientProps {
 export default function HomeClient({ recentPlans, recentNotes, recentLetters }: HomeClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Cursor and Nav logic moved to RootLayout
-  
+  // Custom Cursor Logic
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+  const springConfig = { damping: 25, stiffness: 700 };
+  const cursorXSpring = useSpring(cursorX, springConfig);
+  const cursorYSpring = useSpring(cursorY, springConfig);
+
+  useEffect(() => {
+    const moveCursor = (e: MouseEvent) => {
+      cursorX.set(e.clientX - 16); // Center the 32px cursor
+      cursorY.set(e.clientY - 16);
+    };
+    window.addEventListener("mousemove", moveCursor);
+    return () => window.removeEventListener("mousemove", moveCursor);
+  }, []);
+
   return (
-    <div ref={containerRef} className="bg-[#EBEBEB] min-h-screen text-[#1A1A1A] font-sans selection:bg-[#FF3333] selection:text-white relative">
+    <div ref={containerRef} className="bg-[#EBEBEB] min-h-screen text-[#1A1A1A] font-sans selection:bg-[#FF3333] selection:text-white cursor-none relative">
       
+      {/* Custom Cursor with Mix-Blend Mode */}
+      <motion.div 
+        className="fixed top-0 left-0 w-8 h-8 bg-black rounded-full pointer-events-none z-[100] mix-blend-difference"
+        style={{ x: cursorXSpring, y: cursorYSpring }}
+      />
+
+      {/* Navigation - Fixed, Bold, Mix-Blend */}
+      <nav className="fixed top-0 left-0 w-full p-8 flex justify-between items-start z-50 pointer-events-none mix-blend-difference text-white">
+        <div className="text-2xl font-black tracking-tighter uppercase pointer-events-auto cursor-none">
+          Rin&apos;s Space
+        </div>
+        <div className="flex flex-col items-end gap-1 text-sm font-bold uppercase tracking-widest pointer-events-auto">
+          <Link href="/timeline" className="hover:opacity-50 transition-opacity cursor-none">Timeline</Link>
+          <Link href="/plan" className="hover:opacity-50 transition-opacity cursor-none">Plans</Link>
+          <Link href="/notes" className="hover:opacity-50 transition-opacity cursor-none">Notes</Link>
+          <Link href="/letter" className="hover:opacity-50 transition-opacity cursor-none">Letters</Link>
+          <Link href="/about" className="hover:opacity-50 transition-opacity cursor-none">About</Link>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <section className="h-screen flex flex-col justify-between p-6 pt-32 relative border-b-2 border-[#1A1A1A]">
         <div className="max-w-[90vw] relative z-10">
@@ -78,7 +112,7 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
         </div>
       </section>
 
-      {/* Letter to Visitor */}
+      {/* Letter to Visitor - Expandable */}
       <section className="grid grid-cols-1 md:grid-cols-12 border-b-2 border-[#1A1A1A]">
         <div className="col-span-1 md:col-span-4 p-8 md:p-16 border-b-2 md:border-b-0 md:border-r-2 border-[#1A1A1A] bg-[#1A1A1A] text-[#EBEBEB]">
           <h2 className="text-5xl md:text-6xl font-black leading-none tracking-tighter mb-8 font-sans">
@@ -90,15 +124,9 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
             // LOST IN THE VOID
           </p>
         </div>
-        <div className="col-span-1 md:col-span-8 p-8 md:p-16 flex flex-col justify-center bg-[#EBEBEB]">
-          <p className="text-3xl md:text-5xl font-serif italic font-light leading-tight max-w-4xl text-[#1A1A1A]">
-            "Welcome to this fragment of the internet. Here lies a collection of my thoughts, future plans, and letters sent to the void."
-          </p>
-          <div className="mt-12 flex items-center gap-4">
-             <div className="h-px w-24 bg-[#1A1A1A]" />
-             <span className="font-bold uppercase tracking-widest text-xs font-sans">Rin Tateishi</span>
-          </div>
-        </div>
+        
+        <LetterContent />
+        
       </section>
 
       {/* Distinct Sections Grid */}
@@ -174,6 +202,62 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
           ))}
         </motion.div>
       </footer>
+    </div>
+  );
+}
+
+function LetterContent() {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="col-span-1 md:col-span-8 p-8 md:p-16 flex flex-col justify-center bg-[#EBEBEB] relative">
+      <motion.div 
+        animate={{ height: expanded ? "auto" : "200px" }} 
+        className="overflow-hidden relative"
+      >
+        <p className="text-2xl md:text-4xl font-serif italic font-light leading-tight text-[#1A1A1A]">
+          "Welcome to this fragment of the internet. Here lies a collection of my thoughts, future plans, and letters sent to the void."
+        </p>
+        <AnimatePresence>
+          {expanded && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mt-8 text-lg font-serif leading-relaxed text-[#1A1A1A]/80 max-w-3xl"
+            >
+              <p className="mb-6">
+                This space is not designed to be efficient or optimized for engagement. It is a quiet corner where I can document my journey, successes, and failures without the noise of social media algorithms.
+              </p>
+              <p className="mb-6">
+                Whether you are here to explore my technical blueprints, read my personal reflections, or just wander through the timeline of events, I hope you find something that resonates with you.
+              </p>
+              <p>
+                Take your time. There is no rush here.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {/* Gradient Fade for Collapsed State */}
+        {!expanded && (
+          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#EBEBEB] to-transparent pointer-events-none" />
+        )}
+      </motion.div>
+
+      <div className="mt-8 flex items-center justify-between border-t border-[#1A1A1A]/20 pt-8">
+        <button 
+          onClick={() => setExpanded(!expanded)}
+          className="text-xs font-bold uppercase tracking-widest hover:text-[#FF3333] transition-colors flex items-center gap-2"
+        >
+          {expanded ? "Read Less [-]" : "Read More [+]"}
+        </button>
+        
+        <div className="flex items-center gap-4">
+           <div className="h-px w-12 bg-[#1A1A1A]" />
+           <span className="font-bold uppercase tracking-widest text-xs font-sans">荼蘼</span>
+        </div>
+      </div>
     </div>
   );
 }

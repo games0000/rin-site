@@ -7,11 +7,11 @@ export default function MixBlendNav() {
         Rin&apos;s Space
       </Link>
       <div className="flex flex-col items-end gap-1 text-sm font-bold uppercase tracking-widest pointer-events-auto">
-        <Link href="/about" className="hover:opacity-50 transition-opacity">About</Link>
         <Link href="/timeline" className="hover:opacity-50 transition-opacity">Timeline</Link>
         <Link href="/plan" className="hover:opacity-50 transition-opacity">Plans</Link>
         <Link href="/notes" className="hover:opacity-50 transition-opacity">Notes</Link>
         <Link href="/letter" className="hover:opacity-50 transition-opacity">Letters</Link>
+        <Link href="/about" className="hover:opacity-50 transition-opacity">About</Link>
       </div>
     </nav>
   );
