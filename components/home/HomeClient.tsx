@@ -38,28 +38,10 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
   }, []);
 
   return (
-    <div ref={containerRef} className="bg-[#EBEBEB] min-h-screen text-[#1A1A1A] font-sans selection:bg-[#FF3333] selection:text-white cursor-none relative">
+    <div ref={containerRef} className="bg-[#EBEBEB] min-h-screen text-[#1A1A1A] font-sans selection:bg-[#FF3333] selection:text-white relative">
       
-      {/* Custom Cursor with Mix-Blend Mode */}
-      <motion.div 
-        className="fixed top-0 left-0 w-8 h-8 bg-black rounded-full pointer-events-none z-[100] mix-blend-difference"
-        style={{ x: cursorXSpring, y: cursorYSpring }}
-      />
-
-      {/* Navigation - Fixed, Bold, Mix-Blend */}
-      <nav className="fixed top-0 left-0 w-full p-8 flex justify-between items-start z-50 pointer-events-none mix-blend-difference text-white">
-        <div className="text-2xl font-black tracking-tighter uppercase pointer-events-auto cursor-none">
-          Rin&apos;s Space
-        </div>
-        <div className="flex flex-col items-end gap-1 text-sm font-bold uppercase tracking-widest pointer-events-auto">
-          <Link href="/timeline" className="hover:opacity-50 transition-opacity cursor-none">Timeline</Link>
-          <Link href="/plan" className="hover:opacity-50 transition-opacity cursor-none">Plans</Link>
-          <Link href="/notes" className="hover:opacity-50 transition-opacity cursor-none">Notes</Link>
-          <Link href="/letter" className="hover:opacity-50 transition-opacity cursor-none">Letters</Link>
-          <Link href="/about" className="hover:opacity-50 transition-opacity cursor-none">About</Link>
-        </div>
-      </nav>
-
+      {/* Navigation - Fixed, Bold, Mix-Blend - MOVED TO LAYOUT, REMOVED FROM HERE TO AVOID CONFLICT */}
+      
       {/* Hero Section */}
       <section className="h-screen flex flex-col justify-between p-6 pt-32 relative border-b-2 border-[#1A1A1A]">
         <div className="max-w-[90vw] relative z-10">
