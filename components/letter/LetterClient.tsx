@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 interface Letter {
@@ -18,23 +18,27 @@ export default function LetterClient({ letters }: { letters: Letter[] }) {
   const prevLetter = () => setActiveIndex((prev) => (prev - 1 + letters.length) % letters.length);
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Ambient Background */}
-      <div className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black z-0" />
-      
+    <main className="min-h-screen bg-[#EBEBEB] text-[#1A1A1A] flex flex-col items-center justify-center relative overflow-hidden font-sans">
       <div className="relative z-10 w-full max-w-6xl px-4 flex flex-col items-center">
-        <h1 className="text-4xl md:text-6xl font-serif text-white/20 mb-12 tracking-widest">LETTERS</h1>
+        <header className="mb-24 text-center">
+          <div className="flex items-center gap-4 justify-center mb-4 opacity-40">
+            <div className="w-12 h-1 bg-[#1A1A1A]" />
+            <span className="text-xs font-bold uppercase tracking-widest">Transmissions</span>
+            <div className="w-12 h-1 bg-[#1A1A1A]" />
+          </div>
+          <h1 className="text-6xl md:text-9xl font-black uppercase tracking-tighter mb-8">
+            LETTERS
+          </h1>
+        </header>
 
-        <div className="relative w-full h-[500px] md:h-[600px] flex items-center justify-center perspective-1000">
+        <div className="relative w-full h-[600px] flex items-center justify-center">
           <AnimatePresence mode="popLayout">
             {letters.map((letter, index) => {
-              // Calculate relative index for "carousel" feel
               const offset = (index - activeIndex + letters.length) % letters.length;
               const isCenter = offset === 0;
               const isNext = offset === 1;
               const isPrev = offset === letters.length - 1;
               
-              // Only render relevant cards to save resources
               if (!isCenter && !isNext && !isPrev) return null;
 
               return (
@@ -46,8 +50,7 @@ export default function LetterClient({ letters }: { letters: Letter[] }) {
                     opacity: isCenter ? 1 : 0.4,
                     scale: isCenter ? 1 : 0.8,
                     x: isCenter ? 0 : isNext ? 300 : -300,
-                    z: isCenter ? 100 : 0,
-                    rotateY: isCenter ? 0 : isNext ? -15 : 15,
+                    zIndex: isCenter ? 20 : 10,
                   }}
                   exit={{ opacity: 0, scale: 0.5 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -56,31 +59,30 @@ export default function LetterClient({ letters }: { letters: Letter[] }) {
                     if (isPrev) prevLetter();
                   }}
                   className={`
-                    absolute w-full max-w-xl p-10 md:p-16 rounded-3xl backdrop-blur-md shadow-2xl cursor-pointer
-                    ${isCenter ? 'z-20 bg-white/10 border border-white/20' : 'z-10 bg-white/5 border border-white/5'}
+                    absolute w-full max-w-xl p-10 md:p-16 bg-white border-2 border-[#1A1A1A] shadow-[8px_8px_0px_0px_rgba(26,26,26,1)] cursor-pointer
+                    ${isCenter ? 'z-20' : 'z-10 opacity-50'}
                   `}
-                  style={{ transformStyle: "preserve-3d" }}
                 >
-                  <div className="flex justify-between items-baseline mb-8">
-                    <h2 className="text-3xl font-bold">{letter.title}</h2>
-                    <span className="font-mono text-sm text-white/40">{letter.date}</span>
+                  <div className="flex justify-between items-baseline mb-8 border-b-2 border-[#1A1A1A] pb-4">
+                    <h2 className="text-3xl font-black uppercase leading-none tracking-tight">{letter.title}</h2>
+                    <span className="font-mono text-xs font-bold bg-[#1A1A1A] text-white px-2 py-1">{letter.date}</span>
                   </div>
                   
-                  <div className="prose prose-invert prose-lg max-w-none">
-                    <p className="text-white/80 font-light leading-relaxed whitespace-pre-wrap">
+                  <div className="prose prose-lg prose-neutral max-w-none">
+                    <p className="font-medium leading-relaxed whitespace-pre-wrap opacity-80">
                       {letter.content}
                     </p>
                   </div>
 
                   {isCenter && (
                     <motion.div 
-                      className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex gap-4"
+                      className="absolute -bottom-20 left-1/2 -translate-x-1/2 flex gap-4"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
+                      transition={{ delay: 0.2 }}
                     >
-                      <button onClick={(e) => { e.stopPropagation(); prevLetter(); }} className="p-4 rounded-full bg-white/5 hover:bg-white/20 transition-colors">←</button>
-                      <button onClick={(e) => { e.stopPropagation(); nextLetter(); }} className="p-4 rounded-full bg-white/5 hover:bg-white/20 transition-colors">→</button>
+                      <button onClick={(e) => { e.stopPropagation(); prevLetter(); }} className="w-12 h-12 flex items-center justify-center border-2 border-[#1A1A1A] rounded-full hover:bg-[#1A1A1A] hover:text-white transition-colors font-bold">←</button>
+                      <button onClick={(e) => { e.stopPropagation(); nextLetter(); }} className="w-12 h-12 flex items-center justify-center border-2 border-[#1A1A1A] rounded-full hover:bg-[#1A1A1A] hover:text-white transition-colors font-bold">→</button>
                     </motion.div>
                   )}
                 </motion.div>
