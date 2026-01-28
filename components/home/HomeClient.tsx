@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 interface Post {
   id: string;
@@ -19,192 +19,231 @@ interface HomeClientProps {
 }
 
 export default function HomeClient({ recentPlans, recentNotes, recentLetters }: HomeClientProps) {
-  const { scrollY } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
-  const heroScale = useTransform(scrollY, [0, 500], [1, 0.95]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  // Custom Cursor Logic
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+  const springConfig = { damping: 25, stiffness: 700 };
+  const cursorXSpring = useSpring(cursorX, springConfig);
+  const cursorYSpring = useSpring(cursorY, springConfig);
+
+  useEffect(() => {
+    const moveCursor = (e: MouseEvent) => {
+      cursorX.set(e.clientX - 16);
+      cursorY.set(e.clientY - 16);
+    };
+    window.addEventListener("mousemove", moveCursor);
+    return () => window.removeEventListener("mousemove", moveCursor);
+  }, []);
 
   return (
-    <main className="bg-[#050505] min-h-screen text-white font-sans selection:bg-white/20">
+    <div ref={containerRef} className="bg-[#EBEBEB] min-h-screen text-[#1A1A1A] font-sans selection:bg-[#FF3333] selection:text-white cursor-none">
       
-      {/* 1. Hero Section (Restored) */}
-      <motion.section 
-        className="h-screen flex flex-col items-center justify-center relative overflow-hidden"
-        style={{ opacity: heroOpacity, scale: heroScale }}
-      >
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-white/[0.02] rounded-full blur-[100px] animate-pulse-slow" />
+      {/* Custom Cursor */}
+      <motion.div 
+        className="fixed top-0 left-0 w-8 h-8 bg-[#FF3333] rounded-full pointer-events-none z-50 mix-blend-multiply"
+        style={{ x: cursorXSpring, y: cursorYSpring }}
+      />
+
+      {/* Navigation (Griflan style: minimal, corners) */}
+      <nav className="fixed top-0 left-0 w-full p-6 flex justify-between items-start z-40 pointer-events-none mix-blend-difference text-white">
+        <div className="font-bold text-xl tracking-tighter pointer-events-auto">RIN</div>
+        <div className="flex gap-8 text-sm font-medium pointer-events-auto">
+          <Link href="/timeline" className="hover:underline decoration-2 underline-offset-4">Timeline</Link>
+          <Link href="/plan" className="hover:underline decoration-2 underline-offset-4">Plans</Link>
+          <Link href="/notes" className="hover:underline decoration-2 underline-offset-4">Notes</Link>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="h-screen flex flex-col justify-between p-6 pt-32 relative border-b border-[#1A1A1A]">
+        <div className="max-w-[90vw]">
+          <h1 className="text-[11vw] leading-[0.85] font-black tracking-tighter uppercase">
+            <span className="block overflow-hidden">
+              <motion.span 
+                initial={{ y: "100%" }} 
+                animate={{ y: 0 }} 
+                transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
+                className="block"
+              >
+                Digital
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden">
+              <motion.span 
+                initial={{ y: "100%" }} 
+                animate={{ y: 0 }} 
+                transition={{ duration: 1, delay: 0.1, ease: [0.76, 0, 0.24, 1] }}
+                className="block pl-[10vw] text-[#FF3333]"
+              >
+                Garden
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden">
+              <motion.span 
+                initial={{ y: "100%" }} 
+                animate={{ y: 0 }} 
+                transition={{ duration: 1, delay: 0.2, ease: [0.76, 0, 0.24, 1] }}
+                className="block text-right"
+              >
+                Archive
+              </motion.span>
+            </span>
+          </h1>
         </div>
 
-        <div className="relative z-10 text-center mix-blend-difference">
-          <motion.h1 
-            className="text-[12vw] font-bold leading-none tracking-tighter"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          >
-            RIN&apos;S SPACE
-          </motion.h1>
+        <div className="flex justify-between items-end">
+          <div className="w-64 text-sm font-medium leading-tight">
+            EST. 2026<br/>
+            TOKYO, JAPAN<br/>
+            CURRENTLY BUILDING
+          </div>
           <motion.div 
-            className="mt-8 flex gap-8 justify-center text-xs md:text-sm font-mono text-white/40 uppercase tracking-[0.2em]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1 }}
+            animate={{ rotate: 360 }} 
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            className="w-24 h-24 border border-[#1A1A1A] rounded-full flex items-center justify-center text-xs font-bold uppercase"
           >
-            <span>Digital Garden</span>
-            <span>•</span>
-            <span>Playground</span>
-            <span>•</span>
-            <span>Archive</span>
+            Scroll Down
           </motion.div>
         </div>
+      </section>
 
-        <motion.div 
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-        >
-          <span className="text-[10px] font-mono text-white/30 uppercase tracking-widest">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-white/50 to-transparent" />
-        </motion.div>
-      </motion.section>
-
-      {/* 2. Letter to Visitors */}
-      <section className="py-32 md:py-48 px-6 md:px-12 max-w-4xl mx-auto relative">
-        <div className="absolute left-0 top-0 bottom-0 w-px bg-white/5 hidden md:block" />
-        
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-20%" }}
-          transition={{ duration: 0.8 }}
-          className="md:pl-12"
-        >
-          <span className="block font-mono text-xs text-white/40 mb-8 tracking-widest uppercase">To The Visitor</span>
-          <h2 className="text-3xl md:text-5xl font-serif italic leading-tight text-white/90 mb-8">
-            "Welcome to this fragment of the internet. Here lies a collection of my thoughts, future plans, and letters sent to the void."
+      {/* Letter to Visitor (Griflan "Who this is for" style) */}
+      <section className="grid grid-cols-1 md:grid-cols-12 border-b border-[#1A1A1A]">
+        <div className="col-span-1 md:col-span-4 p-6 md:p-12 border-b md:border-b-0 md:border-r border-[#1A1A1A] bg-[#FF3333] text-white">
+          <h2 className="text-4xl md:text-5xl font-bold leading-none tracking-tight mb-8">
+            TO THE<br/>VISITOR
           </h2>
-          <p className="text-white/50 leading-relaxed font-light max-w-2xl">
-            This space is designed as a digital garden — a place where ideas are planted, nurtured, and allowed to grow wild. Feel free to explore the archives, read through the blueprints of my projects, or simply wander through the timeline of events.
+          <div className="w-12 h-1 bg-black mb-8" />
+          <p className="text-lg font-medium leading-relaxed">
+            Welcome to this fragment of the internet. Here lies a collection of my thoughts, future plans, and letters sent to the void.
           </p>
-          
+        </div>
+        <div className="col-span-1 md:col-span-8 p-6 md:p-12 flex flex-col justify-center">
+          <p className="text-2xl md:text-4xl font-medium leading-tight max-w-3xl">
+            This space is designed as a digital garden — a place where ideas are planted, nurtured, and allowed to grow wild. Feel free to explore the archives, read through the blueprints, or simply wander.
+          </p>
           <div className="mt-12 flex items-center gap-4">
-             <div className="h-px w-12 bg-white/20" />
-             <span className="font-mono text-xs text-white/30">Rin Tateishi</span>
+             <div className="h-px w-24 bg-[#1A1A1A]" />
+             <span className="font-bold uppercase tracking-widest text-sm">Rin Tateishi</span>
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* 3. The Three Sections (Accordion) */}
-      <section className="py-24 px-4 md:px-8 max-w-[1400px] mx-auto">
+      {/* Grid Layout Content (Plans, Notes, Letters) */}
+      <section className="grid grid-cols-1 md:grid-cols-3">
+        {/* Plans Column */}
+        <div className="border-r border-[#1A1A1A] border-b md:border-b-0">
+          <div className="p-6 border-b border-[#1A1A1A] bg-white sticky top-0 z-10">
+            <h3 className="text-xl font-bold uppercase tracking-tight flex justify-between items-center">
+              Plans <span className="text-[#FF3333] text-sm">01</span>
+            </h3>
+          </div>
+          <div className="flex flex-col">
+            {recentPlans.slice(0, 3).map((item, i) => (
+              <GridItem key={item.id} item={item} index={i} type="plan" />
+            ))}
+            <ViewAllLink href="/plan" label="All Plans" />
+          </div>
+        </div>
+
+        {/* Notes Column */}
+        <div className="border-r border-[#1A1A1A] border-b md:border-b-0">
+          <div className="p-6 border-b border-[#1A1A1A] bg-white sticky top-0 z-10">
+            <h3 className="text-xl font-bold uppercase tracking-tight flex justify-between items-center">
+              Notes <span className="text-[#FF3333] text-sm">02</span>
+            </h3>
+          </div>
+          <div className="flex flex-col">
+            {recentNotes.slice(0, 3).map((item, i) => (
+              <GridItem key={item.id} item={item} index={i} type="note" />
+            ))}
+            <ViewAllLink href="/notes" label="All Notes" />
+          </div>
+        </div>
+
+        {/* Letters Column */}
+        <div>
+          <div className="p-6 border-b border-[#1A1A1A] bg-white sticky top-0 z-10">
+            <h3 className="text-xl font-bold uppercase tracking-tight flex justify-between items-center">
+              Letters <span className="text-[#FF3333] text-sm">03</span>
+            </h3>
+          </div>
+          <div className="flex flex-col">
+            {recentLetters.slice(0, 3).map((item, i) => (
+              <GridItem key={item.id} item={item} index={i} type="letter" />
+            ))}
+            <ViewAllLink href="/letter" label="All Letters" />
+          </div>
+        </div>
+      </section>
+
+      {/* Marquee Footer */}
+      <footer className="bg-[#1A1A1A] text-[#EBEBEB] overflow-hidden py-4 md:py-8">
         <motion.div 
-          className="h-[600px] flex flex-col md:flex-row gap-2 md:gap-4"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          className="whitespace-nowrap flex"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ repeat: Infinity, ease: "linear", duration: 20 }}
         >
-          <AccordionSection 
-            id="plans" 
-            title="PLANS" 
-            subtitle="Blueprints" 
-            data={recentPlans} 
-            color="bg-white/5" 
-            hoverColor="hover:bg-cyan-900/20"
-            accent="text-cyan-400"
-          />
-          <AccordionSection 
-            id="notes" 
-            title="NOTES" 
-            subtitle="Thoughts" 
-            data={recentNotes} 
-            color="bg-white/5" 
-            hoverColor="hover:bg-purple-900/20"
-            accent="text-purple-400"
-          />
-          <AccordionSection 
-            id="letters" 
-            title="LETTERS" 
-            subtitle="Transmissions" 
-            data={recentLetters} 
-            color="bg-white/5" 
-            hoverColor="hover:bg-amber-900/20"
-            accent="text-amber-400"
-          />
+          {[...Array(4)].map((_, i) => (
+            <span key={i} className="text-[10vw] font-black uppercase tracking-tighter leading-none mx-4">
+              Rin&apos;s Space — Digital Garden — 
+            </span>
+          ))}
         </motion.div>
-      </section>
-
-      <footer className="py-24 text-center border-t border-white/5 bg-black mt-12">
-        <h2 className="text-[15vw] font-bold text-[#111] leading-none tracking-tighter select-none">END</h2>
-        <p className="text-xs text-white/20 font-mono mt-8">© 2026 RIN&apos;S SPACE</p>
       </footer>
-    </main>
+    </div>
   );
 }
 
-function AccordionSection({ id, title, subtitle, data, color, hoverColor, accent }: any) {
+function GridItem({ item, index, type }: { item: Post, index: number, type: string }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <motion.div
-      className={`relative rounded-2xl overflow-hidden flex flex-col ${color} ${hoverColor} transition-colors duration-500 cursor-pointer border border-white/5 group`}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      animate={{ flex: isHovered ? 2 : 1 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {/* Background Noise */}
-      <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
-
-      {/* Header */}
-      <div className="p-8 flex justify-between items-start relative z-10">
+    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0">
+      <motion.div 
+        className="p-6 h-64 flex flex-col justify-between transition-colors duration-300 hover:bg-[#1A1A1A] hover:text-white"
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+      >
+        <div className="flex justify-between items-start">
+          <span className="font-mono text-xs opacity-50 uppercase">{item.date}</span>
+          <div className={`w-2 h-2 rounded-full ${isHovered ? 'bg-[#FF3333]' : 'bg-[#1A1A1A]'} group-hover:bg-[#FF3333] transition-colors`} />
+        </div>
+        
         <div>
-          <span className={`text-[10px] font-mono uppercase tracking-widest opacity-60 ${accent} block mb-2`}>
-            {subtitle}
-          </span>
-          <h3 className="text-3xl font-bold tracking-tight text-white/90 group-hover:text-white transition-colors">
-            {title}
-          </h3>
+          <h4 className="text-2xl font-bold leading-tight mb-2 line-clamp-2">
+            {item.title}
+          </h4>
+          <p className="text-sm opacity-60 line-clamp-2 leading-relaxed group-hover:opacity-80">
+            {item.excerpt}
+          </p>
         </div>
-        <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center ${accent} opacity-50 group-hover:opacity-100 group-hover:bg-white/10 transition-all`}>
-          ↗
+
+        <div className="overflow-hidden h-6">
+          <motion.div 
+            className="text-xs font-bold uppercase tracking-widest flex items-center gap-2"
+            initial={{ y: 20 }}
+            animate={{ y: isHovered ? 0 : 20 }}
+          >
+            Read {type} <span>→</span>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
+    </Link>
+  );
+}
 
-      {/* Content List (Visible on Hover/Expand) */}
-      <div className="flex-1 p-8 pt-0 overflow-hidden relative">
-        <motion.div 
-          className="flex flex-col gap-4 h-full"
-          animate={{ opacity: isHovered ? 1 : 0.4, y: isHovered ? 0 : 20 }}
-          transition={{ duration: 0.4 }}
-        >
-          {data.slice(0, 3).map((item: any, i: number) => (
-            <Link key={item.id} href={item.link} className="block group/item">
-              <div className="py-4 border-b border-white/5 group-hover/item:border-white/20 transition-colors">
-                <div className="flex justify-between items-baseline">
-                  <h4 className="text-lg font-medium text-white/70 group-hover/item:text-white truncate pr-4 transition-colors">
-                    {item.title}
-                  </h4>
-                  <span className="text-[10px] font-mono text-white/20 shrink-0">
-                    {item.date}
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-          
-          <div className="mt-auto pt-8">
-            <Link 
-              href={`/${id === 'plans' ? 'plan' : id === 'notes' ? 'notes' : 'letter'}`}
-              className={`inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest ${accent} hover:opacity-80`}
-            >
-              Explore All {title} →
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Hover Glow */}
-      <div className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-${accent.split('-')[1]}-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
-    </motion.div>
+function ViewAllLink({ href, label }: { href: string, label: string }) {
+  return (
+    <Link href={href} className="p-6 flex items-center justify-between font-bold uppercase tracking-tight hover:bg-[#FF3333] hover:text-white transition-colors duration-300">
+      <span>{label}</span>
+      <span>→</span>
+    </Link>
   );
 }
