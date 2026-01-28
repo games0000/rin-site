@@ -1,7 +1,14 @@
-import { getPostBySlug } from "@/lib/api";
+import { getPostBySlug, getPosts } from "@/lib/api";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+
+export async function generateStaticParams() {
+  const posts = getPosts("notes");
+  return posts.map((post) => ({
+    slug: post.id,
+  }));
+}
 
 export default async function NoteDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
