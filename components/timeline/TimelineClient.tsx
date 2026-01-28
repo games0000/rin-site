@@ -20,31 +20,36 @@ export default function TimelineClient({ events }: { events: TimelineEvent[] }) 
   });
 
   return (
-    <main ref={containerRef} className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* Background */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-gradient-to-b from-blue-900/10 via-purple-900/10 to-transparent blur-3xl" />
-      </div>
+    <main ref={containerRef} className="min-h-screen bg-black text-white relative overflow-hidden font-sans selection:bg-white/20">
+      
+      {/* Background Gradient */}
+      <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(50,50,50,0.3),rgba(0,0,0,1))] pointer-events-none" />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6 py-32">
-        <motion.h1 
-          className="text-6xl md:text-9xl font-serif font-bold text-center mb-32 text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1 }}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-32 md:py-48">
+        
+        {/* Header */}
+        <motion.header 
+          className="mb-32 md:mb-48 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
         >
-          Timeline
-        </motion.h1>
+          <h1 className="text-8xl md:text-[10rem] font-bold tracking-tighter leading-none mix-blend-difference">
+            TIMELINE
+          </h1>
+          <div className="h-px w-24 bg-white/30 mx-auto mt-8" />
+        </motion.header>
 
         {/* Center Line */}
-        <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-white/10 md:-translate-x-1/2">
+        <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-white/10 md:-translate-x-1/2 z-0">
           <motion.div 
             className="w-full bg-white origin-top"
             style={{ scaleY: scrollYProgress, height: "100%" }}
           />
         </div>
 
-        <div className="space-y-24">
+        {/* Events */}
+        <div className="space-y-32 md:space-y-48 relative z-10">
           {events.map((event, index) => (
             <TimelineItem key={event.id} event={event} index={index} />
           ))}
@@ -59,39 +64,64 @@ function TimelineItem({ event, index }: { event: TimelineEvent; index: number })
   
   return (
     <motion.div 
-      className={`relative flex md:justify-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+      className={`relative flex flex-col md:flex-row items-start md:items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6 }}
+      viewport={{ once: true, margin: "-10%" }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Content */}
-      <div className={`
-        ml-12 md:ml-0 md:w-1/2 
-        ${isEven ? 'md:pr-16 md:text-right' : 'md:pl-16 md:text-left'}
-      `}>
-        <div className="relative group">
-          {/* Connector Line (Desktop) */}
-          <div className={`
-            hidden md:block absolute top-6 w-16 h-px bg-white/20
-            ${isEven ? 'right-[-64px]' : 'left-[-64px]'}
-            group-hover:w-24 group-hover:bg-white transition-all duration-300
-          `} />
+      
+      {/* Desktop Spacer (to push content to side) */}
+      <div className="hidden md:block md:w-1/2" />
 
-          <span className="text-sm font-mono text-blue-400 mb-2 block">{event.date}</span>
-          <h3 className="text-3xl font-bold mb-4">{event.title}</h3>
-          <p className="text-white/60 leading-relaxed text-lg">{event.description}</p>
+      {/* Content Container */}
+      <div className={`
+        pl-12 md:pl-0 md:w-1/2 relative
+        ${isEven ? 'md:pr-24 md:text-right' : 'md:pl-24 md:text-left'}
+      `}>
+        
+        {/* Date Label (Desktop: Absolute positioned near line) */}
+        <span className={`
+          hidden md:block absolute top-1/2 -translate-y-1/2 font-mono text-xs tracking-widest text-white/40
+          ${isEven ? 'right-[-80px] text-left w-16' : 'left-[-80px] text-right w-16'}
+        `}>
+          {event.year || event.date.split(',')[1] || event.date}
+        </span>
+
+        {/* Connector Line (Desktop) */}
+        <div className={`
+          hidden md:block absolute top-1/2 -translate-y-1/2 h-px bg-white/20
+          ${isEven ? 'right-0 w-16' : 'left-0 w-16'}
+        `} />
+
+        {/* Content Body */}
+        <div className="group">
+          {/* Mobile Date */}
+          <span className="md:hidden block text-xs font-mono text-white/40 mb-2 tracking-widest uppercase">
+            {event.date}
+          </span>
+
+          <h3 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight group-hover:text-white/80 transition-colors">
+            {event.title}
+          </h3>
           
+          <p className="text-lg md:text-xl text-white/50 font-light leading-relaxed max-w-md ml-0 md:mx-0">
+            {event.description}
+          </p>
+
           {event.category && (
-            <span className="inline-block mt-4 text-xs uppercase tracking-widest px-3 py-1 border border-white/10 rounded-full text-white/40">
-              {event.category}
-            </span>
+            <div className={`mt-6 ${isEven ? 'md:flex md:justify-end' : ''}`}>
+              <span className="inline-block px-3 py-1 border border-white/20 rounded-full text-xs uppercase tracking-wider text-white/60">
+                {event.category}
+              </span>
+            </div>
           )}
         </div>
       </div>
 
       {/* Center Dot */}
-      <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-6 w-3 h-3 bg-black border-2 border-white rounded-full z-20 shadow-[0_0_20px_rgba(255,255,255,0.5)]" />
+      <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-2 md:top-1/2 md:-translate-y-1/2 w-3 h-3 bg-black border border-white z-20" />
+
     </motion.div>
   );
 }
