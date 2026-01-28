@@ -15,10 +15,10 @@ collections:
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Publish Date", name: "date", widget: "datetime"}
-      - {label: "Body", name: "body", widget: "markdown"}
-      - {label: "Tags", name: "tags", widget: "list"}
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "Tags", name: "tags", widget: "list" }
 
   - name: "letters"
     label: "Letters"
@@ -26,10 +26,16 @@ collections:
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Publish Date", name: "date", widget: "datetime"}
-      - {label: "Body", name: "body", widget: "markdown"}
-      - {label: "Color", name: "color", widget: "select", options: ["bg-white/10", "bg-white/5", "bg-blue-500/10", "bg-purple-500/10"]}
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Body", name: "body", widget: "markdown" }
+      - {
+          label: "Color",
+          name: "color",
+          widget: "select",
+          options:
+            ["bg-white/10", "bg-white/5", "bg-blue-500/10", "bg-purple-500/10"],
+        }
 
   - name: "timeline"
     label: "Timeline"
@@ -37,11 +43,21 @@ collections:
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Date String", name: "dateString", widget: "string", hint: "e.g. Jan 27, 2026"}
-      - {label: "Year", name: "year", widget: "string"}
-      - {label: "Category", name: "category", widget: "select", options: ["Life", "Work", "Project", "Idea"]}
-      - {label: "Description", name: "body", widget: "text"}
+      - { label: "Title", name: "title", widget: "string" }
+      - {
+          label: "Date String",
+          name: "dateString",
+          widget: "string",
+          hint: "e.g. Jan 27, 2026",
+        }
+      - { label: "Year", name: "year", widget: "string" }
+      - {
+          label: "Category",
+          name: "category",
+          widget: "select",
+          options: ["Life", "Work", "Project", "Idea"],
+        }
+      - { label: "Description", name: "body", widget: "text" }
 
   - name: "notes"
     label: "Notes"
@@ -49,6 +65,6 @@ collections:
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Publish Date", name: "date", widget: "datetime"}
-      - {label: "Body", name: "body", widget: "markdown"}
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Body", name: "body", widget: "markdown" }
