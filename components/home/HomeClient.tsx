@@ -211,11 +211,14 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
   );
 }
 
-// 1. Plan Item (Technical, Monospace)
+// 1. Plan Item (Technical, Monospace) - Slide Effect
 function PlanItem({ item, index }: { item: Post, index: number }) {
   return (
-    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 cursor-none">
-      <div className="p-6 transition-colors duration-300 group-hover:bg-[#1A1A1A] group-hover:text-[#00FF00]">
+    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 cursor-none overflow-hidden">
+      {/* Sliding Background */}
+      <div className="absolute inset-0 bg-[#1A1A1A] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0" />
+      
+      <div className="p-6 relative z-10 transition-colors duration-300 group-hover:text-[#00FF00]">
         <div className="flex justify-between items-start mb-4">
           <span className="text-xs opacity-60">ID: {item.date.replace(/-/g, '')}</span>
           <span className="text-xs opacity-0 group-hover:opacity-100">::INIT</span>
@@ -231,11 +234,14 @@ function PlanItem({ item, index }: { item: Post, index: number }) {
   );
 }
 
-// 2. Note Item (Elegant, Serif)
+// 2. Note Item (Elegant, Serif) - Slide Effect
 function NoteItem({ item, index }: { item: Post, index: number }) {
   return (
-    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 cursor-none">
-      <div className="p-8 transition-colors duration-500 group-hover:bg-[#1A1A1A] group-hover:text-white">
+    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 cursor-none overflow-hidden">
+      {/* Sliding Background */}
+      <div className="absolute inset-0 bg-[#1A1A1A] -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out z-0" />
+
+      <div className="p-8 relative z-10 transition-colors duration-500 group-hover:text-white">
         <span className="block text-xs italic opacity-50 mb-2 group-hover:text-[#FF3333] transition-colors">
           {new Date(item.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
         </span>
@@ -250,13 +256,16 @@ function NoteItem({ item, index }: { item: Post, index: number }) {
   );
 }
 
-// 3. Letter Item (Bold, Sans)
+// 3. Letter Item (Bold, Sans) - Slide Effect
 function LetterItem({ item, index }: { item: Post, index: number }) {
   return (
-    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 cursor-none">
-      <div className="p-6 transition-colors duration-300 group-hover:bg-[#FF3333] group-hover:text-white">
+    <Link href={item.link} className="group relative block border-b border-[#1A1A1A] last:border-b-0 cursor-none overflow-hidden">
+      {/* Sliding Background */}
+      <div className="absolute inset-0 bg-[#FF3333] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0" />
+
+      <div className="p-6 relative z-10 transition-colors duration-300 group-hover:text-white">
         <div className="flex gap-2 items-center mb-3">
-          <div className="w-2 h-2 rounded-full bg-[#1A1A1A] group-hover:bg-white" />
+          <div className="w-2 h-2 rounded-full bg-[#1A1A1A] group-hover:bg-white transition-colors" />
           <span className="text-xs font-bold uppercase tracking-widest opacity-50 group-hover:opacity-100">
             Transmission
           </span>
