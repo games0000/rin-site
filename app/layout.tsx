@@ -1,5 +1,4 @@
 import "./globals.css";
-import CustomCursor from "../components/layout/CustomCursor";
 import MixBlendNav from "../components/layout/MixBlendNav";
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -18,9 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#EBEBEB] text-[#1A1A1A] cursor-none`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#EBEBEB] text-[#1A1A1A]`}
       >
-        <CustomCursor />
         <MixBlendNav />
         {children}
       </body>
