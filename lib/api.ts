@@ -4,7 +4,15 @@ import matter from "gray-matter";
 
 const contentDirectory = path.join(process.cwd(), "content");
 
-export function getPosts(collection: string) {
+export interface Post {
+  id: string;
+  title: string;
+  date: string;
+  content: string;
+  [key: string]: any;
+}
+
+export function getPosts(collection: string): Post[] {
   const fullPath = path.join(contentDirectory, collection);
   
   if (!fs.existsSync(fullPath)) {
@@ -22,11 +30,11 @@ export function getPosts(collection: string) {
       id,
       ...data,
       content, // Include the markdown content
-    } as unknown as Record<string, unknown>; // More specific type than any
+    } as Post;
   });
 
   // Sort posts by date
-  return allPosts.sort((a: any, b: any) => {
+  return allPosts.sort((a, b) => {
     if (a.date < b.date) {
       return 1;
     } else {
@@ -35,7 +43,7 @@ export function getPosts(collection: string) {
   });
 }
 
-export function getPostBySlug(collection: string, slug: string) {
+export function getPostBySlug(collection: string, slug: string): Post | null {
   const fullPath = path.join(contentDirectory, collection, `${slug}.md`);
   
   if (!fs.existsSync(fullPath)) {
@@ -49,5 +57,5 @@ export function getPostBySlug(collection: string, slug: string) {
     id: slug,
     ...data,
     content,
-  };
+  } as Post;
 }
