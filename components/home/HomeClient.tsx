@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionTemplate, useMotionValue } from "framer-motion";
 import Link from "next/link";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, MouseEvent } from "react";
 
 interface Post {
   id: string;
@@ -10,7 +10,6 @@ interface Post {
   date: string;
   excerpt: string;
   link: string;
-  type?: string;
 }
 
 interface HomeClientProps {
@@ -21,153 +20,184 @@ interface HomeClientProps {
 
 export default function HomeClient({ recentPlans, recentNotes, recentLetters }: HomeClientProps) {
   const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 500], [0, 200]);
+  const heroScale = useTransform(scrollY, [0, 500], [1, 1.2]);
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
 
-  // Combine all posts into one array
-  const allPosts = [
-    ...recentPlans.map(p => ({ ...p, type: 'Plan' })),
-    ...recentNotes.map(p => ({ ...p, type: 'Note' })),
-    ...recentLetters.map(p => ({ ...p, type: 'Letter' }))
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
   return (
-    <main className="relative bg-black min-h-screen text-white overflow-hidden selection:bg-white/20">
-      {/* Noise Texture */}
-      <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150" />
+    <main className="bg-black min-h-screen text-white selection:bg-white/20">
       
       {/* Hero Section */}
       <motion.section 
-        style={{ y: heroY, opacity: heroOpacity }}
-        className="relative z-10 h-[80vh] flex flex-col items-center justify-center text-center px-4"
+        className="relative h-screen flex flex-col items-center justify-center overflow-hidden"
+        style={{ opacity: heroOpacity }}
       >
-        <div className="relative">
-          <motion.h1 
-            className="text-[15vw] md:text-[12vw] leading-none font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/20"
-            initial={{ filter: "blur(20px)", opacity: 0 }}
-            animate={{ filter: "blur(0px)", opacity: 1 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-          >
+        <motion.div style={{ scale: heroScale }} className="relative z-10 text-center">
+          <h1 className="text-[12vw] font-bold leading-none tracking-tighter mix-blend-difference">
             RIN&apos;S
-          </motion.h1>
-          <motion.h1 
-            className="text-[15vw] md:text-[12vw] leading-none font-bold tracking-tighter text-white mix-blend-difference mt-[-2vw]"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 1.2, ease: "easeOut" }}
-          >
-            SPACE
-          </motion.h1>
-          
-          {/* Glitch Effect Element */}
-          <motion.div 
-            className="absolute inset-0 text-[15vw] md:text-[12vw] font-bold tracking-tighter text-red-500/20 mix-blend-screen pointer-events-none"
-            animate={{ x: [-2, 2, -1, 0], opacity: [0, 0.5, 0] }}
-            transition={{ repeat: Infinity, duration: 3, repeatDelay: 5 }}
-          >
-            RIN&apos;S
-          </motion.div>
-        </div>
-        
-        <motion.div 
-          className="mt-12 flex flex-col md:flex-row gap-6 md:gap-12 text-sm md:text-base font-mono uppercase tracking-widest text-white/40"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-        >
-          <span>Digital Garden</span>
-          <span className="hidden md:inline">•</span>
-          <span>Playground</span>
-          <span className="hidden md:inline">•</span>
-          <span>Thoughts</span>
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20">SPACE</span>
+          </h1>
         </motion.div>
+        
+        {/* Animated Grid Background */}
+        <div className="absolute inset-0 z-0 opacity-20 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </motion.section>
 
-      {/* Horizontal Scroll Section */}
-      <section className="relative z-20 pb-32">
-        <div className="mb-12 px-6 md:px-12 flex items-baseline justify-between max-w-[1920px] mx-auto">
-          <h2 className="text-4xl font-serif italic text-white/80">Latest Updates</h2>
-          <div className="h-px flex-1 bg-white/10 mx-8" />
-          <span className="font-mono text-xs text-white/40">SCROLL →</span>
+      {/* Plans Section - Hover Expand Cards */}
+      <SectionWrapper title="LATEST PLANS" subtitle="Blueprints for the future" href="/plan">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[600px] md:h-[500px]">
+          {recentPlans.map((plan, i) => (
+            <ExpandableCard key={plan.id} item={plan} index={i} color="from-blue-500/20" />
+          ))}
         </div>
+      </SectionWrapper>
 
-        <HorizontalScroll items={allPosts} />
-      </section>
-
-      {/* Footer / Contact */}
-      <section className="relative z-20 py-32 border-t border-white/10 bg-black">
-        <div className="container mx-auto px-6 text-center">
-          <Link href="/timeline" className="group inline-flex flex-col items-center">
-            <span className="text-lg text-white/40 mb-4 group-hover:text-white transition-colors">Explore the Journey</span>
-            <span className="text-6xl md:text-8xl font-serif group-hover:italic transition-all duration-300">Timeline</span>
-          </Link>
+      {/* Notes Section - Magnetic List */}
+      <SectionWrapper title="RECENT NOTES" subtitle="Fragments of thought" href="/notes" dark>
+        <div className="flex flex-col gap-2">
+          {recentNotes.map((note, i) => (
+            <MagneticListItem key={note.id} item={note} index={i} />
+          ))}
         </div>
-      </section>
+      </SectionWrapper>
+
+      {/* Letters Section - Parallax Cards */}
+      <SectionWrapper title="LETTERS" subtitle="Messages sent to the void" href="/letter">
+        <div className="flex flex-col md:flex-row gap-8 justify-center items-center py-12">
+          {recentLetters.map((letter, i) => (
+            <ParallaxCard key={letter.id} item={letter} index={i} />
+          ))}
+        </div>
+      </SectionWrapper>
+
+      <footer className="h-[50vh] flex items-center justify-center border-t border-white/10">
+        <h2 className="text-9xl font-serif text-white/5 font-bold tracking-widest">END</h2>
+      </footer>
     </main>
   );
 }
 
-function HorizontalScroll({ items }: { items: Post[] }) {
-  const targetRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-  });
-
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-75%"]);
-
+function SectionWrapper({ children, title, subtitle, href, dark }: { children: React.ReactNode, title: string, subtitle: string, href: string, dark?: boolean }) {
   return (
-    <div ref={targetRef} className="h-[300vh] relative">
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-        <motion.div style={{ x }} className="flex gap-12 px-12 md:px-24">
-          {items.map((item, i) => (
-            <Card key={item.id + i} item={item} index={i} />
-          ))}
-          {/* End Card */}
-          <div className="w-[30vw] md:w-[20vw] h-[60vh] flex items-center justify-center shrink-0">
-            <div className="w-px h-32 bg-white/20" />
+    <section className={`py-32 px-6 md:px-12 border-t border-white/10 ${dark ? 'bg-[#050505]' : 'bg-black'}`}>
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-end mb-16">
+          <div>
+            <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-4">{title}</h2>
+            <p className="text-xl text-white/40 font-mono">{subtitle}</p>
           </div>
-        </motion.div>
+          <Link href={href} className="hidden md:block px-6 py-3 border border-white/20 rounded-full hover:bg-white hover:text-black transition-colors duration-300">
+            View All
+          </Link>
+        </div>
+        {children}
+        <div className="md:hidden mt-12 text-center">
+          <Link href={href} className="inline-block px-8 py-4 border border-white/20 rounded-full hover:bg-white hover:text-black transition-colors duration-300">
+            View All
+          </Link>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-function Card({ item, index }: { item: Post; index: number }) {
-  const [isHovered, setIsHovered] = useState(false);
+// 1. Expandable Card (Plans)
+function ExpandableCard({ item, index, color }: { item: Post, index: number, color: string }) {
+  return (
+    <Link href={item.link} className="relative group h-full">
+      <motion.div 
+        className="h-full w-full bg-white/5 border border-white/10 rounded-3xl p-8 flex flex-col justify-between overflow-hidden relative"
+        whileHover={{ flex: 2 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+      >
+        <div className={`absolute inset-0 bg-gradient-to-br ${color} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+        
+        <div className="relative z-10">
+          <div className="flex justify-between items-start mb-4">
+            <span className="text-xs font-mono text-white/40 border border-white/10 px-2 py-1 rounded-full">{item.date}</span>
+            <span className="text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">↗</span>
+          </div>
+          <h3 className="text-3xl font-bold leading-tight mb-2">{item.title}</h3>
+        </div>
+
+        <div className="relative z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+          <p className="text-white/70 line-clamp-4">{item.excerpt}</p>
+        </div>
+      </motion.div>
+    </Link>
+  );
+}
+
+// 2. Magnetic List Item (Notes)
+function MagneticListItem({ item, index }: { item: Post, index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const handleMouseMove = (e: MouseEvent) => {
+    const { clientX, clientY } = e;
+    const { left, top, width, height } = ref.current!.getBoundingClientRect();
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+    x.set((clientX - centerX) * 0.1);
+    y.set((clientY - centerY) * 0.1);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
-    <Link href={item.link} className="block group">
+    <Link href={item.link}>
       <motion.div 
-        className="w-[85vw] md:w-[40vw] h-[60vh] relative shrink-0 bg-[#0A0A0A] border border-white/10 p-8 md:p-12 flex flex-col justify-between transition-colors duration-500 hover:border-white/30 hover:bg-[#111]"
-        onHoverStart={() => setIsHovered(true)}
-        onHoverEnd={() => setIsHovered(false)}
-        whileHover={{ scale: 0.98 }}
-        transition={{ duration: 0.4 }}
+        ref={ref}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ x, y }}
+        className="group relative py-8 border-b border-white/10 hover:border-white/30 transition-colors cursor-pointer"
       >
-        <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-          <span className="text-5xl">↗</span>
+        <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4">
+          <h3 className="text-4xl font-medium group-hover:pl-4 transition-all duration-300">{item.title}</h3>
+          <span className="font-mono text-white/40 group-hover:text-white/60 transition-colors">{item.date}</span>
         </div>
+        <motion.div 
+          className="absolute bottom-0 left-0 h-px bg-white w-0 group-hover:w-full transition-all duration-500"
+        />
+      </motion.div>
+    </Link>
+  );
+}
 
-        <div>
-          <div className="flex items-center gap-4 mb-8">
-            <span className="text-xs font-mono px-2 py-1 border border-white/20 rounded-full uppercase tracking-wider text-white/60">
-              {item.type}
-            </span>
-            <span className="text-xs font-mono text-white/40">{item.date}</span>
-          </div>
-          
-          <h3 className="text-4xl md:text-5xl font-bold leading-[1.1] mb-6 line-clamp-3 group-hover:text-white/90 transition-colors">
-            {item.title}
-          </h3>
-        </div>
+// 3. Parallax Card (Letters)
+function ParallaxCard({ item, index }: { item: Post, index: number }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  
+  const y = useTransform(scrollYProgress, [0, 1], [0, index * -50]);
 
+  return (
+    <Link href={item.link} className="block w-full md:w-1/3">
+      <motion.div 
+        ref={ref}
+        style={{ y }}
+        className="bg-[#111] p-10 aspect-[3/4] rounded-sm flex flex-col justify-between hover:bg-[#1a1a1a] transition-colors border border-white/5 hover:border-white/20 group"
+      >
         <div>
-          <p className="text-lg text-white/50 font-light line-clamp-3 md:line-clamp-4 leading-relaxed max-w-xl">
+          <span className="block font-serif italic text-white/30 text-lg mb-6 group-hover:text-white/50 transition-colors">Dear Reader,</span>
+          <h3 className="text-3xl font-bold leading-tight mb-4">{item.title}</h3>
+          <p className="text-white/50 line-clamp-6 font-serif leading-relaxed">
             {item.excerpt}
           </p>
-          
-          <div className="mt-8 overflow-hidden">
-            <div className={`h-px bg-white/20 w-full transform origin-left transition-transform duration-500 ${isHovered ? 'scale-x-100' : 'scale-x-0'}`} />
+        </div>
+        
+        <div className="flex justify-between items-end border-t border-white/10 pt-6">
+          <span className="font-mono text-xs text-white/30">{item.date}</span>
+          <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
+            →
           </div>
         </div>
       </motion.div>
