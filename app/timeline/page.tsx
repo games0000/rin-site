@@ -11,7 +11,11 @@ interface TimelineEvent {
 }
 
 export default function TimelinePage() {
-  const timelineEvents = getPosts("timeline") as unknown as TimelineEvent[];
+  const rawEvents = getPosts("timeline");
+  const timelineEvents = rawEvents.map((event: any) => ({
+    ...event,
+    date: event.date || event.dateString || "Unknown Date",
+  })) as TimelineEvent[];
 
   return <TimelineClient events={timelineEvents} />;
 }

@@ -2,6 +2,7 @@
 
 import { motion, useScroll } from "framer-motion";
 import { useRef } from "react";
+import Link from "next/link";
 
 interface TimelineEvent {
   id: string;
@@ -20,34 +21,56 @@ export default function TimelineClient({ events }: { events: TimelineEvent[] }) 
   });
 
   return (
-    <main ref={containerRef} className="min-h-screen bg-[#EBEBEB] text-[#1A1A1A] relative overflow-hidden font-sans selection:bg-[#FF3333] selection:text-white">
+    <main ref={containerRef} className="min-h-screen bg-[#EBF8FF] text-[#2C5282] relative overflow-hidden font-sans">
       
+      {/* Background Decor */}
+      <motion.div 
+        animate={{ y: [0, 20, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="fixed top-20 left-10 text-[#BEE3F8] text-6xl opacity-40 pointer-events-none"
+      >
+        ☁️
+      </motion.div>
+      <motion.div 
+        animate={{ y: [0, -30, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="fixed top-40 right-20 text-[#BEE3F8] text-8xl opacity-40 pointer-events-none"
+      >
+        ☁️
+      </motion.div>
+      <motion.div 
+        animate={{ rotate: [0, 10, -10, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        className="fixed bottom-20 left-20 text-[#90CDF4] text-4xl opacity-30 pointer-events-none"
+      >
+        ⭐
+      </motion.div>
+
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-32 md:py-48">
         
         {/* Header */}
         <motion.header 
           className="mb-32 md:mb-48 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
         >
           <div className="flex justify-center mb-6">
-            <span className="bg-[#1A1A1A] text-white px-4 py-2 text-sm font-bold uppercase tracking-widest">
-              Chronology
+            <span className="bg-[#BEE3F8] text-[#2B6CB0] px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest shadow-sm font-mono">
+              My Journey
             </span>
           </div>
-          <h1 className="text-8xl md:text-[10rem] font-black tracking-tighter leading-none text-[#1A1A1A]">
-            TIMELINE
+          <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none text-[#2B6CB0] drop-shadow-sm font-rounded">
+            <span className="inline-block hover:animate-spin">T</span>
+            <span className="inline-block hover:animate-bounce">I</span>
+            <span className="inline-block hover:animate-pulse">M</span>
+            <span className="inline-block hover:animate-spin">E</span>
+            <span className="inline-block hover:animate-bounce">L</span>
+            <span className="inline-block hover:animate-pulse">I</span>
+            <span className="inline-block hover:animate-spin">N</span>
+            <span className="inline-block hover:animate-bounce">E</span>
           </h1>
         </motion.header>
 
-        {/* Center Line */}
-        <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-[2px] bg-[#1A1A1A]/10 md:-translate-x-1/2 z-0">
-          <motion.div 
-            className="w-full bg-[#1A1A1A] origin-top"
-            style={{ scaleY: scrollYProgress, height: "100%" }}
-          />
-        </div>
+        {/* Center Line (Dotted) */}
+        <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-[2px] bg-transparent border-l-2 border-dashed border-[#BEE3F8] md:-translate-x-1/2 z-0" />
 
         {/* Events */}
         <div className="space-y-32 md:space-y-48 relative z-10">
@@ -68,11 +91,11 @@ function TimelineItem({ event, index }: { event: TimelineEvent; index: number })
       className={`relative flex flex-col md:flex-row items-start md:items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
     >
       
-      {/* Desktop Spacer (to push content to side) */}
+      {/* Desktop Spacer */}
       <div className="hidden md:block md:w-1/2" />
 
       {/* Content Container */}
@@ -81,47 +104,55 @@ function TimelineItem({ event, index }: { event: TimelineEvent; index: number })
         ${isEven ? 'md:pr-24 md:text-right' : 'md:pl-24 md:text-left'}
       `}>
         
-        {/* Date Label (Desktop: Absolute positioned near line) */}
-        <span className={`
-          hidden md:block absolute top-1/2 -translate-y-1/2 font-mono text-xs font-bold tracking-widest bg-[#EBEBEB] z-10 py-2
-          ${isEven ? 'right-[-80px] text-left w-16 pl-4' : 'left-[-80px] text-right w-16 pr-4'}
+        {/* Date Label */}
+        <span 
+          className={`
+          hidden md:block absolute top-1/2 -translate-y-1/2 font-sans text-sm font-bold tracking-widest bg-[#EBF8FF] text-[#4299E1] z-10 py-2
+          ${isEven ? 'right-[-80px] text-left w-16 pl-4' : 'left-[-80px] text-right w-16 pr-4'} font-mono
         `}>
           {event.year || event.date.split(',')[1] || event.date}
         </span>
 
-        {/* Connector Line (Desktop) */}
-        <div className={`
-          hidden md:block absolute top-1/2 -translate-y-1/2 h-[2px] bg-[#1A1A1A]
-          ${isEven ? 'right-0 w-16' : 'left-0 w-16'}
-        `} />
+        {/* Connector Line */}
+        <div 
+          className={`
+            hidden md:block absolute top-1/2 -translate-y-1/2 h-[2px] border-t-2 border-dashed border-[#BEE3F8] origin-left
+            ${isEven ? 'right-0 w-16' : 'left-0 w-16'}
+          `}
+        />
 
         {/* Content Body */}
-        <div className="group border-2 border-transparent hover:border-[#1A1A1A] p-8 transition-all duration-300 hover:bg-white hover:shadow-[8px_8px_0px_0px_rgba(26,26,26,1)]">
+        <Link href={`/timeline/${event.id}`} className="block group bg-white rounded-2xl border-2 border-transparent hover:border-[#90CDF4] p-8 transition-all duration-300 shadow-[0px_4px_20px_rgba(66,153,225,0.1)] hover:shadow-[0px_8px_30px_rgba(66,153,225,0.2)] hover:-translate-y-1 relative overflow-hidden">
+          {/* Shine Effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
+
           {/* Mobile Date */}
-          <span className="md:hidden block text-xs font-mono font-bold text-[#1A1A1A]/40 mb-2 tracking-widest uppercase">
+          <span className="md:hidden block text-xs font-bold text-[#4299E1] mb-2 tracking-widest uppercase font-mono">
             {event.date}
           </span>
 
-          <h3 className="text-4xl md:text-5xl font-black mb-6 tracking-tight group-hover:text-[#FF3333] transition-colors leading-none">
+          <h3 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight text-[#2C5282] group-hover:text-[#3182CE] transition-colors leading-tight font-rounded">
             {event.title}
           </h3>
           
-          <p className="text-lg md:text-xl text-[#1A1A1A]/60 font-medium leading-relaxed max-w-md ml-0 md:mx-0">
+          <p className="text-lg text-[#2C5282]/70 font-medium leading-relaxed max-w-md ml-0 md:mx-0 font-sans">
             {event.description}
           </p>
 
           {event.category && (
             <div className={`mt-6 ${isEven ? 'md:flex md:justify-end' : ''}`}>
-              <span className="inline-block px-3 py-1 bg-[#1A1A1A] text-white text-xs font-bold uppercase tracking-wider">
+              <span className="inline-block px-4 py-1.5 bg-[#EBF8FF] text-[#3182CE] text-xs font-bold uppercase tracking-wider rounded-lg group-hover:bg-[#BEE3F8] transition-colors font-mono">
                 {event.category}
               </span>
             </div>
           )}
-        </div>
+        </Link>
       </div>
 
-      {/* Center Dot */}
-      <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-2 md:top-1/2 md:-translate-y-1/2 w-4 h-4 bg-[#EBEBEB] border-4 border-[#1A1A1A] z-20" />
+      {/* Center Dot (Star) */}
+      <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-2 md:top-1/2 md:-translate-y-1/2 w-8 h-8 flex items-center justify-center bg-[#EBF8FF] z-20 text-[#4299E1]">
+        ⭐
+      </div>
 
     </motion.div>
   );

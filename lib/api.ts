@@ -34,3 +34,20 @@ export function getPosts(collection: string) {
     }
   });
 }
+
+export function getPostBySlug(collection: string, slug: string) {
+  const fullPath = path.join(contentDirectory, collection, `${slug}.md`);
+  
+  if (!fs.existsSync(fullPath)) {
+    return null;
+  }
+
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const { data, content } = matter(fileContents);
+
+  return {
+    id: slug,
+    ...data,
+    content,
+  };
+}
