@@ -1,9 +1,13 @@
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
-  storage: {
-    kind: 'local',
-  },
+  storage:
+    process.env.NODE_ENV === 'development'
+      ? { kind: 'local' }
+      : {
+          kind: 'github',
+          repo: 'games0000/rin-site',
+        },
   collections: {
     posts: collection({
       label: 'Plans',
