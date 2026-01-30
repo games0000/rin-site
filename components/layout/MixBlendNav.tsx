@@ -1,7 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 export default function MixBlendNav() {
+  const pathname = usePathname();
+
+  // Don't render the nav on the Keystatic admin pages
+  if (pathname?.startsWith("/keystatic")) {
+    return null;
+  }
+
   return (
     <nav className="fixed top-0 left-0 w-full p-6 flex justify-between items-start z-[9999] pointer-events-none">
       <Link href="/" className="pointer-events-auto group">

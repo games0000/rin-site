@@ -20,8 +20,10 @@ export function getPosts(collection: string): Post[] {
   }
 
   const fileNames = fs.readdirSync(fullPath);
-  const allPosts = fileNames.map((fileName) => {
-    const id = fileName.replace(/\.md$/, "");
+  const allPosts = fileNames
+    .filter((fileName) => fileName.endsWith(".md") || fileName.endsWith(".mdoc"))
+    .map((fileName) => {
+    const id = fileName.replace(/\.(md|mdoc)$/, "");
     const fullPath = path.join(contentDirectory, collection, fileName);
     const fileContents = fs.readFileSync(fullPath, "utf8");
     const { data, content } = matter(fileContents);
@@ -44,9 +46,13 @@ export function getPosts(collection: string): Post[] {
 }
 
 export function getPostBySlug(collection: string, slug: string): Post | null {
-  const fullPath = path.join(contentDirectory, collection, `${slug}.md`);
+  const mdPath = path.join(contentDirectory, collection, `${slug}.md`);
+  const mdocPath = path.join(contentDirectory, collection, `${slug}.mdoc`);
   
-  if (!fs.existsSync(fullPath)) {
+  let fullPath = mdPath;
+  if (fs.existsSync(mdocPath)) {
+    fullPath = mdocPath;
+  } else if (!fs.existsSync(mdPath)) {
     return null;
   }
 
