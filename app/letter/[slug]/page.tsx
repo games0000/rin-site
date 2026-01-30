@@ -6,13 +6,14 @@ import { Metadata } from "next";
 export async function generateStaticParams() {
   const posts = getPosts("letters");
   return posts.map((post) => ({
-    slug: post.id,
+    slug: encodeURIComponent(post.id),
   }));
 }
 
 export default async function LetterDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = getPostBySlug("letters", slug);
+  const decodedSlug = decodeURIComponent(slug);
+  const post = getPostBySlug("letters", decodedSlug);
 
   if (!post) {
     notFound();
@@ -61,7 +62,8 @@ export default async function LetterDetailPage({ params }: { params: Promise<{ s
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
-    const post = getPostBySlug("letters", slug);
+    const decodedSlug = decodeURIComponent(slug);
+    const post = getPostBySlug("letters", decodedSlug);
     if (!post) return { title: "Not Found" };
     return { title: `${post.title} | Letters` };
 }

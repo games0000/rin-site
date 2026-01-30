@@ -6,13 +6,14 @@ import { Metadata } from "next";
 export async function generateStaticParams() {
   const posts = getPosts("notes");
   return posts.map((post) => ({
-    slug: post.id,
+    slug: encodeURIComponent(post.id),
   }));
 }
 
 export default async function NoteDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = getPostBySlug("notes", slug);
+  const decodedSlug = decodeURIComponent(slug);
+  const post = getPostBySlug("notes", decodedSlug);
 
   if (!post) {
     notFound();
@@ -59,7 +60,8 @@ export default async function NoteDetailPage({ params }: { params: Promise<{ slu
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
-    const post = getPostBySlug("notes", slug);
+    const decodedSlug = decodeURIComponent(slug);
+    const post = getPostBySlug("notes", decodedSlug);
     if (!post) return { title: "Not Found" };
     return { title: `${post.title} | Notes` };
 }

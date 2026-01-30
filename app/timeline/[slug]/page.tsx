@@ -6,13 +6,14 @@ import { Metadata } from "next";
 export async function generateStaticParams() {
   const posts = getPosts("timeline");
   return posts.map((post) => ({
-    slug: post.id,
+    slug: encodeURIComponent(post.id),
   }));
 }
 
 export default async function TimelineDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = getPostBySlug("timeline", slug);
+  const decodedSlug = decodeURIComponent(slug);
+  const post = getPostBySlug("timeline", decodedSlug);
 
   if (!post) {
     notFound();
@@ -63,7 +64,8 @@ export default async function TimelineDetailPage({ params }: { params: Promise<{
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
-    const post = getPostBySlug("timeline", slug);
+    const decodedSlug = decodeURIComponent(slug);
+    const post = getPostBySlug("timeline", decodedSlug);
     if (!post) return { title: "Not Found" };
     return { title: `${post.title} | Timeline` };
 }

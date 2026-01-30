@@ -16,10 +16,16 @@ interface HomeClientProps {
   recentPlans: Post[];
   recentNotes: Post[];
   recentLetters: Post[];
+  recentTimeline: Post[];
 }
 
-export default function HomeClient({ recentPlans, recentNotes, recentLetters }: HomeClientProps) {
+export default function HomeClient({ recentPlans, recentNotes, recentLetters, recentTimeline }: HomeClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Merge all posts and sort by date
+  const allRecentPosts = [...recentPlans, ...recentNotes, ...recentLetters, ...recentTimeline]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 6);
 
   return (
     <div ref={containerRef} className="bg-[#FFF8F0] min-h-screen text-[#1A1A1A] font-sans selection:bg-[#FFD1DC] selection:text-[#FF8E8E] relative overflow-hidden">
@@ -122,70 +128,29 @@ export default function HomeClient({ recentPlans, recentNotes, recentLetters }: 
       {/* Distinct Sections Grid */}
       <section className="grid grid-cols-1 md:grid-cols-3 bg-[#1A1A1A] gap-[2px]">
         
-        {/* Plans: Garden / Growth */}
-        <div className="bg-[#F0FFF4] flex flex-col h-full relative overflow-hidden">
+        {/* Recent Updates (Mixed) */}
+        <div className="bg-[#F0FFF4] flex flex-col h-full relative overflow-hidden md:col-span-3">
           {/* Decorative background elements */}
           <div className="absolute top-[-20px] left-[-20px] w-40 h-40 bg-[#C6F6D5] rounded-full opacity-30 pointer-events-none blur-2xl" />
           <div className="absolute bottom-20 right-[-20px] w-32 h-32 bg-[#9AE6B4] rounded-full opacity-30 pointer-events-none blur-2xl" />
 
           <div className="p-6 bg-[#F0FFF4]/80 backdrop-blur-sm sticky top-0 z-10 flex justify-between items-center border-b-2 border-dashed border-[#9AE6B4]">
             <h3 className="text-xl font-mono font-bold text-[#48BB78] tracking-tighter flex items-center gap-2">
-              <span>🌱</span> 01_PLANS
+              <span>🌱</span> RECENT UPDATES
             </h3>
             <div className="w-3 h-3 bg-[#48BB78] rounded-tl-xl rounded-br-xl" />
           </div>
-          <div className="flex-1 flex flex-col font-mono p-4 gap-4">
-            {recentPlans.slice(0, 3).map((item, i) => (
-              <PlanItem key={item.id} item={item} index={i} />
-            ))}
-            <Link href="/plan" className="mt-auto mx-4 mb-6 p-4 bg-white rounded-xl border-2 border-[#9AE6B4] text-[#48BB78] hover:bg-[#48BB78] hover:text-white transition-all duration-300 shadow-[4px_4px_0px_0px_#C6F6D5] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-center font-bold tracking-widest uppercase text-xs">
-              [ View All Seeds ]
-            </Link>
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 font-mono">
+            {allRecentPosts.map((item, i) => {
+                if (item.link.includes('plan')) return <PlanItem key={item.id} item={item} index={i} />;
+                if (item.link.includes('note')) return <NoteItem key={item.id} item={item} index={i} />;
+                if (item.link.includes('letter')) return <LetterItem key={item.id} item={item} index={i} />;
+                return <PlanItem key={item.id} item={item} index={i} />; // Fallback
+            })}
           </div>
-        </div>
-
-        {/* Notes: Cute / Soft */}
-        <div className="bg-[#FFF8F0] flex flex-col h-full relative overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-10 right-10 w-20 h-20 bg-[#FFD1DC] rounded-full blur-3xl opacity-50 pointer-events-none" />
-          <div className="absolute bottom-10 left-10 w-32 h-32 bg-[#FFE4E1] rounded-full blur-3xl opacity-50 pointer-events-none" />
-
-          <div className="p-6 bg-[#FFF8F0]/80 backdrop-blur-sm sticky top-0 z-10 flex justify-between items-center border-b-2 border-dashed border-[#FFB7B2]">
-            <h3 className="text-2xl font-sans font-bold text-[#FF8E8E] tracking-wide flex items-center gap-2">
-              <span>✿</span> 02. Notes
-            </h3>
-            <div className="w-3 h-3 rounded-full bg-[#FF8E8E]" />
-          </div>
-          <div className="flex-1 flex flex-col font-sans p-4 gap-4">
-            {recentNotes.slice(0, 3).map((item, i) => (
-              <NoteItem key={item.id} item={item} index={i} />
-            ))}
-            <Link href="/notes" className="mt-auto mx-4 mb-6 p-4 bg-white rounded-2xl border-2 border-[#FFB7B2] text-[#FF8E8E] hover:bg-[#FF8E8E] hover:text-white transition-all duration-300 shadow-[4px_4px_0px_0px_#FFD1DC] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-center font-bold tracking-wide">
-              Read all thoughts ➜
-            </Link>
-          </div>
-        </div>
-
-        {/* Letters: Warm / Postal */}
-        <div className="bg-[#FFFAF0] flex flex-col h-full relative overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-4 border-[#FEEBC8] rounded-full opacity-40 pointer-events-none" />
-          <div className="absolute top-10 right-10 rotate-12 opacity-20 pointer-events-none">
-            <div className="w-20 h-24 border-2 border-[#F6AD55] border-dashed" />
-          </div>
-
-          <div className="p-6 bg-[#FFFAF0]/80 backdrop-blur-sm sticky top-0 z-10 flex justify-between items-center border-b-2 border-dashed border-[#FBD38D]">
-            <h3 className="text-xl font-sans font-black uppercase tracking-tight text-[#ED8936] flex items-center gap-2">
-              <span>🕊️</span> 03 LETTERS
-            </h3>
-            <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-[#ED8936]" />
-          </div>
-          <div className="flex-1 flex flex-col font-sans p-4 gap-4">
-            {recentLetters.slice(0, 3).map((item, i) => (
-              <LetterItem key={item.id} item={item} index={i} />
-            ))}
-            <Link href="/letter" className="mt-auto mx-4 mb-6 p-4 bg-white rounded-lg border-2 border-[#FBD38D] text-[#ED8936] hover:bg-[#ED8936] hover:text-white transition-all duration-300 shadow-[4px_4px_0px_0px_#FEEBC8] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-center font-bold text-sm tracking-wide">
-              OPEN MAILBOX
+          <div className="p-6 flex justify-center">
+             <Link href="/timeline" className="px-6 py-2 bg-white rounded-full border-2 border-[#9AE6B4] text-[#48BB78] hover:bg-[#48BB78] hover:text-white transition-all duration-300 shadow-[4px_4px_0px_0px_#C6F6D5] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-center font-bold tracking-widest uppercase text-xs">
+              View Full Timeline
             </Link>
           </div>
         </div>
