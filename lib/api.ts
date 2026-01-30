@@ -28,9 +28,13 @@ export function getPosts(collection: string): Post[] {
     const fileContents = fs.readFileSync(fullPath, "utf8");
     const { data, content } = matter(fileContents);
 
+    // Normalize date: use data.date, or data.dateString (for timeline), or fallback to current date
+    const date = data.date || data.dateString || new Date().toISOString().split('T')[0];
+
     return {
       id,
       ...data,
+      date,
       content, // Include the markdown content
     } as Post;
   });
@@ -59,9 +63,13 @@ export function getPostBySlug(collection: string, slug: string): Post | null {
   const fileContents = fs.readFileSync(fullPath, "utf8");
   const { data, content } = matter(fileContents);
 
+  // Normalize date: use data.date, or data.dateString (for timeline), or fallback to current date
+  const date = data.date || data.dateString || new Date().toISOString().split('T')[0];
+
   return {
     id: slug,
     ...data,
+    date,
     content,
   } as Post;
 }
