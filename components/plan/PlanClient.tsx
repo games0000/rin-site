@@ -102,7 +102,7 @@ function PlanCard({ plan, index }: { plan: Plan; index: number }) {
             className="flex justify-between items-start mb-6 border-b border-[#F0FFF4] pb-4"
         >
           <span className="text-[10px] font-bold uppercase tracking-widest text-[#48BB78] bg-[#F0FFF4] px-2 py-1 rounded">
-            SEED_{plan.date.replace(/-/g, '').slice(2)}
+            SEED_{plan.date ? plan.date.replace(/-/g, '').slice(2) : 'UNKNOWN'}
           </span>
           <div className="text-xl group-hover:scale-125 transition-transform duration-300 group-hover:rotate-12">🌿</div>
         </div>

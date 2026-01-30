@@ -304,7 +304,7 @@ function PlanItem({ item, index }: { item: Post, index: number }) {
         <Link href={item.link} className="group relative block bg-white rounded-xl border-2 border-transparent hover:border-[#9AE6B4] shadow-sm hover:shadow-[4px_4px_0px_0px_#C6F6D5] transition-all duration-300 transform hover:-translate-y-1 overflow-hidden cursor-pointer p-6">
         <div className="flex justify-between items-start mb-3">
             <span className="inline-block px-2 py-1 bg-[#F0FFF4] text-[#48BB78] rounded-md text-[10px] font-bold uppercase tracking-wider border border-[#C6F6D5]">
-            SEED_{item.date.replace(/-/g, '').slice(2)}
+            SEED_{item.date ? item.date.replace(/-/g, '').slice(2) : 'UNKNOWN'}
             </span>
             <span className="text-xs opacity-0 group-hover:opacity-100 text-[#48BB78]">🌿</span>
         </div>
