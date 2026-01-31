@@ -20,7 +20,7 @@ const wrap = (method: 'GET' | 'POST') => async (req: NextRequest, context: any) 
         console.log(`[Keystatic] Cookie length: ${cookieHeader.length}`);
     }
 
-    const response = await handler[method](req, context);
+    const response = await handler[method](req);
     
     // Log redirect location to see if state is attached
     const location = response.headers.get('location');
