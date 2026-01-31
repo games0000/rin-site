@@ -1,39 +1,40 @@
 import { makeRouteHandler } from '@keystatic/next/route-handler';
 import config from '../../../../keystatic.config';
-
-// Debug logging
-console.log('Keystatic Route Handler Initialized');
-console.log('Environment Check:');
-console.log('- NODE_ENV:', process.env.NODE_ENV);
-
-const clientId = process.env.KEYSTATIC_GITHUB_CLIENT_ID;
-const clientSecret = process.env.KEYSTATIC_GITHUB_CLIENT_SECRET;
-const secret = process.env.KEYSTATIC_SECRET;
-
-console.log('- KEYSTATIC_GITHUB_CLIENT_ID exists:', !!clientId);
-if (clientId) {
-    console.log(`- Client ID (first 5): ${clientId.substring(0, 5)}...`);
-    console.log(`- Client ID (length): ${clientId.length}`);
-}
-
-console.log('- KEYSTATIC_GITHUB_CLIENT_SECRET exists:', !!clientSecret);
-if (clientSecret) {
-    console.log(`- Client Secret (first 2): ${clientSecret.substring(0, 2)}...`);
-    console.log(`- Client Secret (last 2): ...${clientSecret.substring(clientSecret.length - 2)}`);
-    console.log(`- Client Secret (length): ${clientSecret.length}`);
-}
-
-console.log('- KEYSTATIC_SECRET exists:', !!secret);
-if (secret) {
-    console.log(`- Secret (length): ${secret.length}`);
-}
-
-// Log config repo to verify
-const repoConfig = config.storage.kind === 'github' ? config.storage.repo : 'local';
-console.log('- Configured Repo:', repoConfig);
+import { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export const { GET, POST } = makeRouteHandler({
+const handler = makeRouteHandler({
   config,
 });
+
+const wrap = (method: 'GET' | 'POST') => async (req: NextRequest, context: any) => {
+    const url = new URL(req.url);
+    console.log(`[Keystatic ${method}] Path: ${url.pathname}`);
+    console.log(`[Keystatic ${method}] Query: ${url.search}`);
+    
+    // Log headers to debug proxy/cookie issues
+    const cookieHeader = req.headers.get('cookie');
+    console.log(`[Keystatic] Cookie Header present: ${!!cookieHeader}`);
+    if (cookieHeader) {
+        console.log(`[Keystatic] Cookie length: ${cookieHeader.length}`);
+    }
+
+    const response = await handler[method](req, context);
+    
+    // Log redirect location to see if state is attached
+    const location = response.headers.get('location');
+    if (location) {
+        console.log(`[Keystatic] Redirecting to: ${location}`);
+        if (location.includes('state=')) {
+            console.log('[Keystatic] State parameter detected in redirect');
+        } else {
+            console.error('[Keystatic] WARNING: No state parameter in redirect URL!');
+        }
+    }
+
+    return response;
+};
+
+export const GET = wrap('GET');
+export const POST = wrap('POST');
