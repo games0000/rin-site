@@ -5,9 +5,11 @@ export default config({
     process.env.NODE_ENV === 'development'
       ? { kind: 'local' }
       : {
-          kind: 'github',
-          repo: 'games0000/rin-site',
+          kind: 'cloud',
         },
+  cloud: {
+    project: 'riinsite/rin-site',
+  },
   collections: {
     posts: collection({
       label: 'Plans',
